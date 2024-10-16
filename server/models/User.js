@@ -13,10 +13,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  roles: {
-    type: String,
-    default: "Sales Person",
-  },
+  roles: [
+    {
+      type: String,
+      default: "Sales Person",
+    },
+  ],
 });
 
 module.exports = mongoose.model("User", userSchema);
