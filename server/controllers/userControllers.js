@@ -8,8 +8,8 @@ const bcrypt = require("bcrypt");
 //@access Private
 const getAllUsers = asyncHandler(async (req, res) => {
   const users = await User.find().select("-password").lean();
-  if (!users) {
-    return res.status(204).json({ message: "No users found" });
+  if (!users?.length) {
+    return res.status(400).json({ message: "No users found" });
   }
 
   res.status(200).json(users);
@@ -20,10 +20,16 @@ const getAllUsers = asyncHandler(async (req, res) => {
 //@access Private
 const createNewUser = asyncHandler(async (req, res) => {
   //Destrucutures username, password, and roles from inocoming req.body
-  const { username, password, roles } = req.body;
+  const { name, username, password, roles } = req.body;
 
   //Ensure all required fields are provided, else return 400 bad request
-  if (!username || !password || !Array.isArray(roles) || roles.length === 0) {
+  if (
+    !name ||
+    !username ||
+    !password ||
+    !Array.isArray(roles) ||
+    roles.length === 0
+  ) {
     return res.status(400).json({ message: `All fields are required` });
   }
 
@@ -37,7 +43,7 @@ const createNewUser = asyncHandler(async (req, res) => {
   //Hash password using 10 salt rounds.
   const hashedPwd = await bcrypt.hash(password, 10); //salt rounds
 
-  const userObject = { username, password: hashedPwd, roles };
+  const userObject = { name, username, password: hashedPwd, roles };
 
   //Create and store new user
   const user = await User.create(userObject);
@@ -54,9 +60,9 @@ const createNewUser = asyncHandler(async (req, res) => {
 //@route PATCH /users
 //@access Private
 const updateUser = asyncHandler(async (req, res) => {
-  const { id, username, roles, password } = req.body;
+  const { id, name, username, roles, password } = req.body;
 
-  if (!id || !username || !roles.length) {
+  if (!id || !name || !username || !roles.length) {
     return res.status(400).json({ message: `All fields are required` });
   }
 
@@ -75,6 +81,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
   //mongoose document, update properties exists only
   //no password, no update password every update
+  user.name = name;
   user.username = username;
   user.roles = roles;
 
@@ -86,7 +93,7 @@ const updateUser = asyncHandler(async (req, res) => {
   //need mongoose document
   const updatedUser = await user.save();
 
-  res.status(200).json({ message: `${updateUser.username} updated` });
+  res.status(200).json({ message: `${updatedUser.username} updated` });
 });
 
 //@desc Delete a user
@@ -101,19 +108,23 @@ const deleteUser = asyncHandler(async (req, res) => {
 
   //no delete user, if user have campaign
   const campaign = await Campaign.findOne({ user: id }).lean().exec();
-  if (campaign?.length) {
+  if (campaign) {
     return res.status(400).json({ message: `User has assigned campaign` });
   }
 
+  // Does the user exist to delete?
   const user = await User.findById(id).exec();
 
   if (!user) {
-    return res.status(404).json({ message: `User not found` });
+    return res.status(400).json({ message: "User not found" });
   }
+
+  // Save user details before deleting
+  const { username, _id } = user;
 
   const result = await user.deleteOne();
 
-  const reply = `Username ${result.username} with ID ${result._id} deleted`;
+  const reply = `Username ${username} with ID ${_id} deleted`;
 
   res.json(reply);
 });
