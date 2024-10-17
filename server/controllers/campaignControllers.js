@@ -14,6 +14,18 @@ const getAllCampaigns = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "No campaigns found" });
   }
 
+  // Add username to each campaign before sending the response
+  // See Promise.all with map() here: https://youtu.be/4lqJBBEpjRE
+  // You could also do this with a for...of loop
+  const campaignsWithUser = await Promise.all(
+    campaigns.map(async (campaign) => {
+      const user = await User.findById(campaign.user).lean().exec();
+      return { ...campaign, username: user.username };
+    })
+  );
+
+  res.json(campaignsWithUser);
+
   res.status(200).json(campaigns);
 });
 
@@ -21,7 +33,8 @@ const getAllCampaigns = asyncHandler(async (req, res) => {
 //@route POST /campaign
 //@access Private
 const createNewCampaign = asyncHandler(async (req, res) => {
-  const { user, title, social_media, post_type, post_url } = req.body;
+  const { user, title, social_media, post_type, post_url, completed } =
+    req.body;
 
   if (!user || !title || !social_media || !post_type || !post_url) {
     return res.status(400).json({ message: `All fields are required` });
