@@ -12,7 +12,6 @@ export const campaignsApiSlice = apiSlice.injectEndpoints({
       validateStatus: (response, result) => {
         return response.status === 200 && !result.isError;
       },
-      keepUnusedDataFor: 5,
       transformResponse: (responseData) => {
         const loadedCampaigns = responseData.map((campaign) => {
           campaign.id = campaign._id;
@@ -29,10 +28,47 @@ export const campaignsApiSlice = apiSlice.injectEndpoints({
         } else return [{ type: "Campaign", id: "LIST" }];
       },
     }),
+    addNewCampaign: builder.mutation({
+      query: (initialCampaign) => ({
+        url: "/campaigns",
+        method: "POST",
+        body: {
+          ...initialCampaign,
+        },
+      }),
+      invalidatesTags: [{ type: "Campaign", id: "LIST" }],
+    }),
+    updateCampaign: builder.mutation({
+      query: (initialCampaign) => ({
+        url: "/campaigns",
+        method: "PATCH",
+        body: {
+          ...initialCampaign,
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "Campaign", id: arg.id },
+      ],
+    }),
+    deleteCampaign: builder.mutation({
+      query: ({ id }) => ({
+        url: `/campaigns`,
+        method: "DELETE",
+        body: { id },
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "Campaign", id: arg.id },
+      ],
+    }),
   }),
 });
 
-export const { useGetCampaignsQuery } = campaignsApiSlice;
+export const {
+  useGetCampaignsQuery,
+  useAddNewCampaignMutation,
+  useUpdateCampaignMutation,
+  useDeleteCampaignMutation,
+} = campaignsApiSlice;
 
 // returns the query result object
 export const selectCampaignsResult =

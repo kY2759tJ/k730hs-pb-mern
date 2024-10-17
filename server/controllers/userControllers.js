@@ -60,10 +60,19 @@ const createNewUser = asyncHandler(async (req, res) => {
 //@route PATCH /users
 //@access Private
 const updateUser = asyncHandler(async (req, res) => {
-  const { id, name, username, roles, password } = req.body;
+  const { id, name, username, roles, active, password } = req.body;
 
-  if (!id || !name || !username || !roles.length) {
-    return res.status(400).json({ message: `All fields are required` });
+  // Confirm data
+  if (
+    !id ||
+    !username ||
+    !Array.isArray(roles) ||
+    !roles.length ||
+    typeof active !== "boolean"
+  ) {
+    return res
+      .status(400)
+      .json({ message: "All fields except password are required" });
   }
 
   const user = await User.findById(id).exec();
@@ -84,6 +93,7 @@ const updateUser = asyncHandler(async (req, res) => {
   user.name = name;
   user.username = username;
   user.roles = roles;
+  user.active = active;
 
   if (password) {
     //Hash password

@@ -6,6 +6,11 @@ import DashLayout from "./components/DashLayout";
 import Welcome from "./features/auth/Welcome";
 import CampaignList from "./features/campaigns/CampaignList";
 import UserList from "./features/users/UserList";
+import EditUser from "./features/users/EditUser";
+import NewUserForm from "./features/users/NewUserForm";
+import EditCampaign from "./features/campaigns/EditCampaign";
+import NewCampaign from "./features/campaigns/NewCampaign";
+import Prefetch from "./features/auth/Prefetch";
 
 function App() {
   return (
@@ -17,31 +22,49 @@ function App() {
         <Route
           index
           element={<Public />}
-        ></Route>
+        />
         <Route
           path="login"
           element={<Login />}
-        ></Route>
+        />
       </Route>
-      <Route
-        path="dash"
-        element={<DashLayout />}
-      >
+      <Route element={<Prefetch />}>
         <Route
-          index
-          element={<Welcome />}
-        ></Route>
-        <Route path="campaigns">
+          path="dash"
+          element={<DashLayout />}
+        >
           <Route
             index
-            element={<CampaignList />}
-          ></Route>
-        </Route>
-        <Route path="users">
-          <Route
-            index
-            element={<UserList />}
-          ></Route>
+            element={<Welcome />}
+          />
+          <Route path="users">
+            <Route
+              index
+              element={<UserList />}
+            />
+            <Route
+              path=":id"
+              element={<EditUser />}
+            />
+            <Route
+              path="new"
+              element={<NewUserForm />}
+            />
+          </Route>
+          <Route path="campaigns">
+            <Route
+              index
+              element={<CampaignList />}
+            />
+            <Route
+              path=":id"
+              element={<EditCampaign />}
+            />
+            <Route
+              path="new"
+              element={<NewCampaign />}
+            />
+          </Route>
         </Route>
       </Route>
       {/*End Dash */}

@@ -8,7 +8,11 @@ const CampaignsList = () => {
     isSuccess,
     isError,
     error,
-  } = useGetCampaignsQuery();
+  } = useGetCampaignsQuery(undefined, {
+    pollingInterval: 15000,
+    refetchOnFocus: true,
+    refetchOnMountOrArgChange: true,
+  });
 
   let content;
 
