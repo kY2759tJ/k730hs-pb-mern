@@ -28,6 +28,7 @@ app.use("/", express.static(path.join(__dirname, "public"))); //tell where to fi
 
 app.use("/", require("./routes/root"));
 app.use("/users", require("./routes/userRoutes"));
+app.use("/campaigns", require("./routes/campaignRoutes"));
 
 app.all("*", (req, res) => {
   res.status(404);
