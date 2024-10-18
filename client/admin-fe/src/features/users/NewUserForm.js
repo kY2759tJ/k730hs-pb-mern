@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useAddNewUserMutation } from "./usersApiSlice";
 import { useNavigate } from "react-router-dom";
 import { ROLES } from "../../config/roles";
@@ -12,55 +12,19 @@ const NewUserForm = () => {
   const [addNewUser, { isLoading, isSuccess, isError, error }] =
     useAddNewUserMutation();
 
+  const [form] = Form.useForm(); // Create a form instance
   const navigate = useNavigate();
-
-  const [name, setName] = useState("");
-  const [validName, setValidName] = useState(false);
-  const [username, setUsername] = useState("");
-  const [validUsername, setValidUsername] = useState(false);
-  const [password, setPassword] = useState("");
-  const [validPassword, setValidPassword] = useState(false);
-  const [roles, setRoles] = useState(["Salesperson"]);
-
-  useEffect(() => {
-    setValidName(NAME_REGEX.test(name));
-  }, [name]);
-
-  useEffect(() => {
-    setValidUsername(USER_REGEX.test(username));
-  }, [username]);
-
-  useEffect(() => {
-    setValidPassword(PWD_REGEX.test(password));
-  }, [password]);
 
   useEffect(() => {
     if (isSuccess) {
-      setName("");
-      setUsername("");
-      setPassword("");
-      setRoles([]);
+      form.resetFields();
       navigate("/dash/users");
     }
-  }, [isSuccess, navigate]);
+  }, [isSuccess, navigate, form]);
 
-  const onNameChanged = (e) => setName(e.target.value);
-  const onUsernameChanged = (e) => setUsername(e.target.value);
-  const onPasswordChanged = (e) => setPassword(e.target.value);
-
-  const onRolesChanged = (selectedRoles) => {
-    setRoles(selectedRoles);
-  };
-
-  const canSave =
-    [roles.length, validName, validUsername, validPassword].every(Boolean) &&
-    !isLoading;
-
-  const onSaveUserClicked = async (values) => {
-    console.log(values);
-    if (canSave) {
-      await addNewUser({ name, username, password, roles });
-    }
+  const onFinish = async (values) => {
+    const { name, username, password, roles } = values;
+    await addNewUser({ name, username, password, roles });
   };
 
   const options = Object.values(ROLES).map((role) => ({
@@ -68,25 +32,18 @@ const NewUserForm = () => {
     label: role,
   }));
 
-  console.log(options);
-
   const errClass = isError ? "errmsg" : "offscreen";
-  const validNameClass = !validName ? "form__input--incomplete" : "";
-  const validUserClass = !validUsername ? "form__input--incomplete" : "";
-  const validPwdClass = !validPassword ? "form__input--incomplete" : "";
-  const validRolesClass = !Boolean(roles.length)
-    ? "form__input--incomplete"
-    : "";
+  const errContent = error?.data?.message ?? "";
 
   const content = (
     <>
-      <p className={errClass}>{error?.data?.message}</p>
+      <p className={errClass}>{errContent}</p>
       <Form
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 14 }}
         layout="horizontal"
         style={{ maxWidth: 600 }}
-        onFinish={onSaveUserClicked}
+        onFinish={onFinish}
       >
         <div className="form__title-row">
           <h2>New User</h2>
@@ -94,53 +51,46 @@ const NewUserForm = () => {
         <Form.Item
           name="name"
           label="Name"
-          rules={[{ required: true, message: "Please input your full name!" }]}
-          className={`form__input ${validNameClass}`}
+          rules={[
+            { required: true, message: "Please input your full name!" },
+            { pattern: NAME_REGEX, message: "Invalid name format!" },
+          ]}
         >
-          <Input
-            placeholder="Full Name"
-            value={name}
-            onChange={onNameChanged}
-          />
+          <Input placeholder="Full Name" />
         </Form.Item>
         <Form.Item
           name="username"
           label="Username"
-          rules={[{ required: true, message: "Please input your username!" }]}
-          className={`form__input ${validUserClass}`}
+          rules={[
+            { required: true, message: "Please input your username!" },
+            { pattern: USER_REGEX, message: "3-20 letters only" },
+          ]}
         >
-          <Input
-            placeholder="[3-20 letters]"
-            value={username}
-            onChange={onUsernameChanged}
-          />
+          <Input placeholder="[3-20 letters]" />
         </Form.Item>
         <Form.Item
           name="password"
           label="Password"
-          rules={[{ required: true, message: "Please input your password!" }]}
-          className={`form__input ${validPwdClass}`}
+          rules={[
+            { required: true, message: "Please input your password!" },
+            { pattern: PWD_REGEX, message: "4-12 valid characters" },
+          ]}
         >
           <Input
             type="password"
             placeholder="Password"
-            value={password}
-            onChange={onPasswordChanged}
           />
         </Form.Item>
         <Form.Item
           name="roles"
           label="Roles"
           rules={[{ required: true, message: "Please select roles!" }]}
-          className={`form__select ${validRolesClass}`}
         >
           <Select
             mode="multiple"
             placeholder="Select roles"
             style={{ width: "100%" }}
-            value={roles}
             options={options}
-            onChange={onRolesChanged}
           ></Select>
         </Form.Item>
         <div className="form__action-buttons">
@@ -148,7 +98,8 @@ const NewUserForm = () => {
             type="primary"
             title="Save"
             htmlType="submit"
-            disabled={!canSave}
+            loading={isLoading}
+            disabled={isLoading}
           >
             Add New User
           </Button>
