@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAddNewUserMutation } from "./usersApiSlice";
 import { useNavigate } from "react-router-dom";
-import { ROLES } from "../../config/roles";
+import { ROLES } from "../../config/enums";
 import { Form, Input, Button, Select } from "antd";
 
 const NAME_REGEX = /^[a-zA-Z]+([ '-][a-zA-Z]+)*$/;
@@ -54,6 +54,7 @@ const NewUserForm = () => {
         <div className="form__title-row">
           <h2>New User</h2>
         </div>
+
         <Form.Item
           name="name"
           label="Name"
@@ -64,6 +65,7 @@ const NewUserForm = () => {
         >
           <Input placeholder="Full Name" />
         </Form.Item>
+
         <Form.Item
           name="username"
           label="Username"
@@ -74,6 +76,7 @@ const NewUserForm = () => {
         >
           <Input placeholder="[3-20 letters]" />
         </Form.Item>
+
         <Form.Item
           name="password"
           label="Password"
@@ -87,6 +90,7 @@ const NewUserForm = () => {
             placeholder="Password"
           />
         </Form.Item>
+
         <Form.Item
           name="roles"
           label="Roles"
@@ -99,6 +103,7 @@ const NewUserForm = () => {
             options={options}
           ></Select>
         </Form.Item>
+
         <div className="form__action-buttons">
           <Button
             type="primary"

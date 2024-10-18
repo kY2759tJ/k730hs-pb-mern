@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 
+// Define valid social media type
+const USERROLES = ["Admin", "Salesperson"];
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -16,6 +19,7 @@ const userSchema = new mongoose.Schema({
   roles: [
     {
       type: String,
+      enum: USERROLES,
       default: "Salesperson",
     },
   ],
