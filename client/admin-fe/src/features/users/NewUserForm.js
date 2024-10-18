@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAddNewUserMutation } from "./usersApiSlice";
 import { useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { ROLES } from "../../config/roles";
 import { Form, Input, Button, Select } from "antd";
 
@@ -92,44 +90,36 @@ const NewUserForm = () => {
       >
         <div className="form__title-row">
           <h2>New User</h2>
-          <div className="form__action-buttons">
-            <Button
-              type="primary"
-              title="Save"
-              htmlType="submit"
-              disabled={!canSave}
-            >
-              Submit
-            </Button>
-          </div>
         </div>
         <Form.Item
           name="name"
           label="Name"
           rules={[{ required: true, message: "Please input your full name!" }]}
           className={`form__input ${validNameClass}`}
-          value={name}
-          onChange={onNameChanged}
         >
-          <Input placeholder="Full Name" />
+          <Input
+            placeholder="Full Name"
+            value={name}
+            onChange={onNameChanged}
+          />
         </Form.Item>
         <Form.Item
           name="username"
           label="Username"
           rules={[{ required: true, message: "Please input your username!" }]}
           className={`form__input ${validUserClass}`}
-          value={username}
-          onChange={onUsernameChanged}
         >
-          <Input placeholder="[3-20 letters]" />
+          <Input
+            placeholder="[3-20 letters]"
+            value={username}
+            onChange={onUsernameChanged}
+          />
         </Form.Item>
         <Form.Item
           name="password"
           label="Password"
           rules={[{ required: true, message: "Please input your password!" }]}
           className={`form__input ${validPwdClass}`}
-          value={password}
-          onChange={onPasswordChanged}
         >
           <Input
             type="password"
@@ -142,17 +132,27 @@ const NewUserForm = () => {
           name="roles"
           label="Roles"
           rules={[{ required: true, message: "Please select roles!" }]}
+          className={`form__select ${validRolesClass}`}
         >
           <Select
             mode="multiple"
             placeholder="Select roles"
             style={{ width: "100%" }}
-            className={`form__select ${validRolesClass}`}
             value={roles}
             options={options}
             onChange={onRolesChanged}
           ></Select>
         </Form.Item>
+        <div className="form__action-buttons">
+          <Button
+            type="primary"
+            title="Save"
+            htmlType="submit"
+            disabled={!canSave}
+          >
+            Add New User
+          </Button>
+        </div>
       </Form>
     </>
   );
