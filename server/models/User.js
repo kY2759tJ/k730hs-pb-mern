@@ -23,6 +23,9 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  salespersonDetails: {
+    commission_rate: Number,
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);
