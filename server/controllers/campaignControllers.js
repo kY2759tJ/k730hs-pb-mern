@@ -24,9 +24,7 @@ const getAllCampaigns = asyncHandler(async (req, res) => {
     })
   );
 
-  res.json(campaignsWithUser);
-
-  res.status(200).json(campaigns);
+  res.status(200).json(campaignsWithUser);
 });
 
 //@desc Create new campaign
