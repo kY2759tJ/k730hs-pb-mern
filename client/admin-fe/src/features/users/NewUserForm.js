@@ -24,7 +24,12 @@ const NewUserForm = () => {
 
   const onFinish = async (values) => {
     const { name, username, password, roles } = values;
-    await addNewUser({ name, username, password, roles });
+    try {
+      await addNewUser({ name, username, password, roles });
+      console.log("User added successfully");
+    } catch (err) {
+      console.error("Failed to add user:", err);
+    }
   };
 
   const options = Object.values(ROLES).map((role) => ({
@@ -39,6 +44,7 @@ const NewUserForm = () => {
     <>
       <p className={errClass}>{errContent}</p>
       <Form
+        form={form}
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 14 }}
         layout="horizontal"
