@@ -31,11 +31,12 @@ const getAllCampaigns = asyncHandler(async (req, res) => {
 //@route POST /campaign
 //@access Private
 const createNewCampaign = asyncHandler(async (req, res) => {
-  const { user, title, social_media, post_type, post_url, completed } =
-    req.body;
+  const { user, status, title, social_media, post_type, post_url } = req.body;
 
-  if (!user || !title || !social_media || !post_type || !post_url) {
-    return res.status(400).json({ message: `All fields are required` });
+  if (!user || !status || !title || !social_media || !post_type || !post_url) {
+    return res
+      .status(400)
+      .json({ message: `All campaign fields are required` });
   }
 
   //Check for duplicated campaign title, if duplicates found, return 409 conflicts
@@ -48,6 +49,7 @@ const createNewCampaign = asyncHandler(async (req, res) => {
   //Create and store new campaign
   const campaign = await Campaign.create({
     user,
+    status,
     title,
     social_media,
     post_type,
@@ -66,9 +68,9 @@ const createNewCampaign = asyncHandler(async (req, res) => {
 //@route PATCH /campaign
 //@access Private
 const updateCampaign = asyncHandler(async (req, res) => {
-  const { id, title, social_media, post_type, post_url } = req.body;
+  const { id, status, title, social_media, post_type, post_url } = req.body;
 
-  if (!id || !title || !social_media || !post_type || !post_url) {
+  if (!id || !status || !title || !social_media || !post_type || !post_url) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -87,6 +89,7 @@ const updateCampaign = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: "Duplicate campaign title" });
   }
 
+  campaign.status = status;
   campaign.title = title;
   campaign.social_media = social_media;
   campaign.post_type = post_type;

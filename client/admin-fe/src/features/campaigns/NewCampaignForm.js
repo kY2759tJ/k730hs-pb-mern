@@ -1,123 +1,188 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAddNewCampaignMutation } from "./campaignsApiSlice";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave } from "@fortawesome/free-solid-svg-icons";
+import { Form, Input, Button, Select } from "antd";
 
-const NewCampaignForm = ({ users }) => {
+import {
+  SocialMediaType,
+  PostType,
+  CampaignStatuses,
+} from "../../config/enums";
+
+// URL validation rule
+const urlValidationRule = {
+  type: "url",
+  message: "Please enter a valid URL!",
+};
+
+const NewCampaignForm = ({ campaigns }) => {
   const [addNewCampaign, { isLoading, isSuccess, isError, error }] =
     useAddNewCampaignMutation();
 
+  const [form] = Form.useForm(); // Create a form instance
+  const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
 
-  const [title, setTitle] = useState("");
-  const [text, setText] = useState("");
-  const [userId, setUserId] = useState(users[0].id);
+  // Simulate getting the user ID from session (e.g., API call or localStorage)
+  useEffect(() => {
+    const sessionUserId =
+      localStorage.getItem("userId") || "67123030c0fe0863752fe002"; // Replace with actual logic
+    console.log(sessionUserId);
+    setUserId(sessionUserId);
+  }, []);
+
+  // Update the form field once userId is set
+  useEffect(() => {
+    if (userId) {
+      form.setFieldsValue({ user: userId });
+    }
+  }, [userId, form]);
 
   useEffect(() => {
     if (isSuccess) {
-      setTitle("");
-      setText("");
-      setUserId("");
+      form.resetFields();
       navigate("/dash/campaigns");
     }
-  }, [isSuccess, navigate]);
+  }, [isSuccess, navigate, form]);
 
-  const onTitleChanged = (e) => setTitle(e.target.value);
-  const onTextChanged = (e) => setText(e.target.value);
-  const onUserIdChanged = (e) => setUserId(e.target.value);
+  const onFinish = async (values) => {
+    const { user, status, title, social_media, post_type, post_url } = values;
+    console.log("Payload to send:", {
+      user,
+      status,
+      title,
+      social_media,
+      post_type,
+      post_url,
+    }); // Add this line for debugging
 
-  const canSave = [title, text, userId].every(Boolean) && !isLoading;
-
-  const onSaveCampaignClicked = async (e) => {
-    e.preventDefault();
-    if (canSave) {
-      await addNewCampaign({ user: userId, title, text });
+    try {
+      await addNewCampaign({
+        user,
+        status,
+        title,
+        social_media,
+        post_type,
+        post_url,
+      });
+      console.log("Campaign added successfully");
+    } catch (err) {
+      console.error("Failed to add campaign:", err);
     }
   };
 
-  const options = users.map((user) => {
-    return (
-      <option
-        key={user.id}
-        value={user.id}
-      >
-        {" "}
-        {user.username}
-      </option>
-    );
-  });
+  const socialMediaTypeOptions = Object.values(SocialMediaType).map(
+    (social_media_option) => ({
+      value: social_media_option,
+      label: social_media_option,
+    })
+  );
+
+  const postTypeOptions = Object.values(PostType).map(
+    (campaign_type_option) => ({
+      value: campaign_type_option,
+      label: campaign_type_option,
+    })
+  );
+
+  const campaignStatusesOptions = Object.values(CampaignStatuses).map(
+    (campaign_status_option) => ({
+      value: campaign_status_option,
+      label: campaign_status_option,
+    })
+  );
 
   const errClass = isError ? "errmsg" : "offscreen";
-  const validTitleClass = !title ? "form__input--incomplete" : "";
-  const validTextClass = !text ? "form__input--incomplete" : "";
+  const errContent = error?.data?.message ?? "";
 
   const content = (
     <>
-      <p className={errClass}>{error?.data?.message}</p>
-
-      <form
-        className="form"
-        onSubmit={onSaveCampaignClicked}
+      <p className={errClass}>{errContent}</p>
+      <Form
+        form={form}
+        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 14 }}
+        layout="horizontal"
+        style={{ maxWidth: 600 }}
+        onFinish={onFinish}
       >
         <div className="form__title-row">
           <h2>New Campaign</h2>
-          <div className="form__action-buttons">
-            <button
-              className="icon-button"
-              title="Save"
-              disabled={!canSave}
-            >
-              <FontAwesomeIcon icon={faSave} />
-            </button>
-          </div>
         </div>
-        <label
-          className="form__label"
-          htmlFor="title"
+
+        <Form.Item name="user">
+          <Input type="" />
+        </Form.Item>
+
+        <Form.Item
+          name="status"
+          label="Campaign Status"
+          rules={[
+            { required: true, message: "Please select a campaign status!" },
+          ]}
         >
-          Title:
-        </label>
-        <input
-          className={`form__input ${validTitleClass}`}
-          id="title"
+          <Select
+            placeholder="Select campaign status"
+            style={{ width: "100%" }}
+            options={campaignStatusesOptions}
+          ></Select>
+        </Form.Item>
+
+        <Form.Item
           name="title"
-          type="text"
-          autoComplete="off"
-          value={title}
-          onChange={onTitleChanged}
-        />
+          label="Title"
+          rules={[{ required: true, message: "Please input campaign title!" }]}
+        >
+          <Input placeholder="Campaign Title" />
+        </Form.Item>
 
-        <label
-          className="form__label"
-          htmlFor="text"
+        <Form.Item
+          name="social_media"
+          label="Social Media"
+          rules={[{ required: true, message: "Please select a social media!" }]}
         >
-          Text:
-        </label>
-        <textarea
-          className={`form__input form__input--text ${validTextClass}`}
-          id="text"
-          name="text"
-          value={text}
-          onChange={onTextChanged}
-        />
+          <Select
+            placeholder="Select social media"
+            style={{ width: "100%" }}
+            options={socialMediaTypeOptions}
+          ></Select>
+        </Form.Item>
 
-        <label
-          className="form__label form__checkbox-container"
-          htmlFor="username"
+        <Form.Item
+          name="post_type"
+          label="Post Type"
+          rules={[{ required: true, message: "Please select a post type!" }]}
         >
-          ASSIGNED TO:
-        </label>
-        <select
-          id="username"
-          name="username"
-          className="form__select"
-          value={userId}
-          onChange={onUserIdChanged}
+          <Select
+            placeholder="Select post type"
+            style={{ width: "100%" }}
+            options={postTypeOptions}
+          ></Select>
+        </Form.Item>
+
+        <Form.Item
+          name="post_url"
+          label="Post URL"
+          rules={[
+            { required: true, message: "URL is required!" },
+            urlValidationRule,
+          ]}
         >
-          {options}
-        </select>
-      </form>
+          <Input placeholder="https://example.com" />
+        </Form.Item>
+
+        <div className="form__action-buttons">
+          <Button
+            type="primary"
+            title="Save"
+            htmlType="submit"
+            loading={isLoading}
+            disabled={isLoading}
+          >
+            Add New Campaign
+          </Button>
+        </div>
+      </Form>
     </>
   );
 

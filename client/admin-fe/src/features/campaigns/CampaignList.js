@@ -36,7 +36,7 @@ const CampaignsList = () => {
         key: "status",
         dataIndex: "status",
         render: (status) => (
-          <Tag color={status === "active" ? "green" : "grey"}>
+          <Tag color={status === "Active" ? "green" : "grey"}>
             {status.toUpperCase()}
           </Tag>
         ),

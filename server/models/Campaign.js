@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 // Define valid social media type
-const socialMediaType = ["Facebook", "Instagram"];
+const SocialMediaType = ["Facebook", "Instagram"];
 
 // Define valid campaign type
-const campaignType = ["Post", "Event", "Live Post"];
+const CampaignType = ["Post", "Event", "Live Post"];
 
 // Define valid statuses
-const campaignStatuses = ["active", "completed"];
+const CampaignStatuses = ["Active", "Completed"];
 
 const campaignSchema = new mongoose.Schema(
   {
@@ -17,18 +17,24 @@ const campaignSchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
+    status: {
+      type: String,
+      enum: CampaignStatuses,
+      default: "active", // Default status
+      required: true,
+    },
     title: {
       type: String,
       required: true,
     },
     social_media: {
       type: String,
-      enum: socialMediaType,
+      enum: SocialMediaType,
       required: true,
     },
     post_type: {
       type: String,
-      enum: campaignType,
+      enum: CampaignType,
       required: true,
     },
     post_url: {
@@ -43,12 +49,6 @@ const campaignSchema = new mongoose.Schema(
         message: (props) => `${props.value} is not a valid URL!`,
       },
       required: [true, "Campaign URL is required."],
-    },
-    status: {
-      type: String,
-      enum: campaignStatuses,
-      default: "active", // Default status
-      required: true,
     },
   },
   { timestamps: true }
