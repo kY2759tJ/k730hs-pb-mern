@@ -293,7 +293,7 @@ tr {
 }
 
 .form__select {
-  width: fit-content;
+  width: 100%;
   padding: 0.25em;
 }
 
