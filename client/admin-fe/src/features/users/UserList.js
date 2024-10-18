@@ -1,5 +1,7 @@
 import { useGetUsersQuery } from "./usersApiSlice";
-import User from "./User";
+import { Space, Table, Tag, Button } from "antd";
+import { EditOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const UserList = () => {
   const {
@@ -14,52 +16,87 @@ const UserList = () => {
     refetchOnMountOrArgChange: true,
   });
 
+  const navigate = useNavigate();
+
   let content;
 
   if (isLoading) content = <p>Loading...</p>;
 
   if (isError) {
-    content = <p className="errmsg">{error?.data?.message}</p>;
+    content = <p className="errmsg">{error?.data?.messusername}</p>;
   }
 
   if (isSuccess) {
     const { ids } = users;
 
-    const tableContent = ids?.length
-      ? ids.map((userId) => (
-          <User
-            key={userId}
-            userId={userId}
-          />
-        ))
+    const columns = [
+      {
+        title: "Name",
+        dataIndex: "name",
+        key: "name",
+        render: (text) => <a>{text}</a>,
+      },
+      {
+        title: "Username",
+        dataIndex: "username",
+        key: "username",
+      },
+      {
+        title: "Roles",
+        key: "roles",
+        dataIndex: "roles",
+        render: (_, { roles }) => (
+          <>
+            {roles.map((tag) => {
+              let color = tag.length > 5 ? "geekblue" : "green";
+              return (
+                <Tag
+                  color={color}
+                  key={tag}
+                >
+                  {tag.toUpperCase()}
+                </Tag>
+              );
+            })}
+          </>
+        ),
+      },
+      {
+        title: "Action",
+        key: "action",
+        render: (_, record) => (
+          <Space size="middle">
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<EditOutlined />}
+              onClick={() => navigate(`/dash/users/${record.action}`)}
+            />
+          </Space>
+        ),
+      },
+    ];
+
+    const dataSource = ids?.length
+      ? ids.map((userId) => {
+          const user = users.entities[userId];
+          if (user) {
+            return {
+              key: userId, // Unique key for each row
+              name: user.name,
+              username: user.username,
+              roles: user.roles,
+              action: userId, // Placeholder for action column (for edit button)
+            };
+          }
+        })
       : null;
 
     content = (
-      <table className="table table--users">
-        <thead className="table__thead">
-          <tr>
-            <th
-              scope="col"
-              className="table__th user__username"
-            >
-              Username
-            </th>
-            <th
-              scope="col"
-              className="table__th user__roles"
-            >
-              Roles
-            </th>
-            <th
-              scope="col"
-              className="table__th user__edit"
-            >
-              Edit
-            </th>
-          </tr>
-        </thead>
-        <tbody>{tableContent}</tbody>
-      </table>
+      <Table
+        columns={columns}
+        dataSource={dataSource}
+      />
     );
   }
 
