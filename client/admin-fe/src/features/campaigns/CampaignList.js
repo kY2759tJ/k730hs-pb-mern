@@ -1,5 +1,8 @@
 import { useGetCampaignsQuery } from "./campaignsApiSlice";
-import Campaign from "./Campaign";
+//import Campaign from "./Campaign";
+import { Space, Table, Tag, Button } from "antd";
+import { EditOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const CampaignsList = () => {
   const {
@@ -14,6 +17,8 @@ const CampaignsList = () => {
     refetchOnMountOrArgChange: true,
   });
 
+  const navigate = useNavigate();
+
   let content;
 
   if (isLoading) content = <p>Loading...</p>;
@@ -25,59 +30,80 @@ const CampaignsList = () => {
   if (isSuccess) {
     const { ids } = campaigns;
 
-    const tableContent = ids?.length
-      ? ids.map((campaignId) => (
-          <Campaign
-            key={campaignId}
-            campaignId={campaignId}
-          />
-        ))
-      : null;
+    const columns = [
+      {
+        title: "Status",
+        key: "status",
+        dataIndex: "status",
+        render: (status) => (
+          <Tag color={status === "active" ? "green" : "grey"}>
+            {status.toUpperCase()}
+          </Tag>
+        ),
+      },
+      {
+        title: "Campaign Title",
+        key: "title",
+        dataIndex: "title",
+        render: (text) => <p>{text}</p>,
+      },
+      {
+        title: "Social Media",
+        dataIndex: "social_media",
+        key: "social_media",
+      },
+      {
+        title: "Post Type",
+        dataIndex: "post_type",
+        key: "post_type",
+      },
+      {
+        title: "Post URL",
+        dataIndex: "post_url",
+        key: "post_url",
+        render: (text) => <a>{text}</a>,
+      },
+      {
+        title: "Action",
+        key: "action",
+        render: (_, record) => (
+          <Space size="middle">
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<EditOutlined />}
+              onClick={() => navigate(`/dash/campaigns/${record.action}`)}
+            />
+          </Space>
+        ),
+      },
+    ];
+
+    const dataSource = ids?.length
+      ? ids
+          .map((campaignId) => {
+            const campaign = campaigns.entities[campaignId];
+            if (campaign) {
+              return {
+                key: campaignId, // Unique key for each row
+                status: campaign.status,
+                title: campaign.title,
+                social_media: campaign.social_media,
+                post_type: campaign.post_type,
+                post_url: campaign.post_url,
+                action: campaignId, // Placeholder for action column (e.g., for edit button)
+              };
+            }
+            return null; // Explicitly return null if campaign is not found
+          })
+          .filter(Boolean) // Remove null values
+      : [];
 
     content = (
-      <table className="table table--campaigns">
-        <thead className="table__thead">
-          <tr>
-            <th
-              scope="col"
-              className="table__th campaign__status"
-            >
-              Username
-            </th>
-            <th
-              scope="col"
-              className="table__th campaign__created"
-            >
-              Created
-            </th>
-            <th
-              scope="col"
-              className="table__th campaign__updated"
-            >
-              Updated
-            </th>
-            <th
-              scope="col"
-              className="table__th campaign__title"
-            >
-              Title
-            </th>
-            <th
-              scope="col"
-              className="table__th campaign__username"
-            >
-              Owner
-            </th>
-            <th
-              scope="col"
-              className="table__th campaign__edit"
-            >
-              Edit
-            </th>
-          </tr>
-        </thead>
-        <tbody>{tableContent}</tbody>
-      </table>
+      <Table
+        columns={columns}
+        dataSource={dataSource}
+      />
     );
   }
 
