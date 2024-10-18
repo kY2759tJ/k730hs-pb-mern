@@ -15,7 +15,7 @@
   --COLOR: #fff;
   --ERROR: firebrick;
   --INACTIVE: lightgray;
-  --LINK-COLOR: rgb(65, 100, 255);
+  --LINK-COLOR: whitesmoke;
   --LINK-HOVER: rgba(245, 245, 245, 0.9);
   --NOTE-BGCOLOR: hsla(240, 64%, 27%, 0.65);
   --STATUS-COMPLETE: limegreen;
@@ -362,4 +362,20 @@ tr {
   .form__action-buttons {
     position: static;
   }
+}
+
+/**
+Ant CSS
+**/
+:where(.ant-form) label,
+h2 {
+  color: white !important; /* Change form background color */
+}
+
+:where(.ant-table) a {
+  color: #0042f7;
+}
+
+input.ant-input.ant-input-disabled.css-dev-only-do-not-override-1hpnbz2.ant-input-outlined {
+  background-color: #ffffff;
 }
