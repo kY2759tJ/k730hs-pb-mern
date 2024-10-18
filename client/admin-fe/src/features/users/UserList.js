@@ -2,7 +2,13 @@ import { useGetUsersQuery } from "./usersApiSlice";
 import { Space, Table, Tag, Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-
+// Utility function
+const capitalizeName = (name) => {
+  return name
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};
 const UserList = () => {
   const {
     data: users,
@@ -31,10 +37,20 @@ const UserList = () => {
 
     const columns = [
       {
+        title: "Active",
+        key: "active",
+        dataIndex: "active",
+        render: (isActive) => (
+          <Tag color={isActive ? "green" : "red"}>
+            {isActive ? "Active" : "Inactive"}
+          </Tag>
+        ),
+      },
+      {
         title: "Name",
-        dataIndex: "name",
         key: "name",
-        render: (text) => <a>{text}</a>,
+        dataIndex: "name",
+        render: (text) => <p>{text}</p>,
       },
       {
         title: "Username",
@@ -78,19 +94,23 @@ const UserList = () => {
     ];
 
     const dataSource = ids?.length
-      ? ids.map((userId) => {
-          const user = users.entities[userId];
-          if (user) {
-            return {
-              key: userId, // Unique key for each row
-              name: user.name,
-              username: user.username,
-              roles: user.roles,
-              action: userId, // Placeholder for action column (for edit button)
-            };
-          }
-        })
-      : null;
+      ? ids
+          .map((userId) => {
+            const user = users.entities[userId];
+            if (user) {
+              return {
+                key: userId, // Unique key for each row
+                active: user.active,
+                name: capitalizeName(user.name),
+                username: user.username,
+                roles: user.roles,
+                action: userId, // Placeholder for action column (e.g., for edit button)
+              };
+            }
+            return null; // Explicitly return null if user is not found
+          })
+          .filter(Boolean) // Remove null values
+      : [];
 
     content = (
       <Table
