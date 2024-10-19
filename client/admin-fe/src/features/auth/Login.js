@@ -1,15 +1,12 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-
+import { Button, Form, Input, message } from "antd";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "./authSlice";
 import { useLoginMutation } from "./authApiSlice";
 
 const Login = () => {
   const userRef = useRef();
-  const errRef = useRef();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [errMsg, setErrMsg] = useState("");
 
   const navigate = useNavigate();
@@ -21,17 +18,11 @@ const Login = () => {
     userRef.current.focus();
   }, []);
 
-  useEffect(() => {
-    setErrMsg("");
-  }, [username, password]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onFinish = async (values) => {
+    const { username, password } = values;
     try {
       const { accessToken } = await login({ username, password }).unwrap();
       dispatch(setCredentials({ accessToken }));
-      setUsername("");
-      setPassword("");
       navigate("/dash");
     } catch (err) {
       if (!err.status) {
@@ -43,12 +34,9 @@ const Login = () => {
       } else {
         setErrMsg(err.data?.message);
       }
-      errRef.current.focus();
+      message.error(errMsg); // Display error using Ant Design message
     }
   };
-
-  const handleUserInput = (e) => setUsername(e.target.value);
-  const handlePwdInput = (e) => setPassword(e.target.value);
 
   const errClass = errMsg ? "errmsg" : "offscreen";
 
@@ -57,44 +45,53 @@ const Login = () => {
   const content = (
     <section className="public">
       <header>
-        <h1>Employee Login</h1>
+        <h1>Login</h1>
       </header>
       <main className="login">
         <p
-          ref={errRef}
+          ref={userRef}
           className={errClass}
           aria-live="assertive"
         >
           {errMsg}
         </p>
 
-        <form
+        <Form
+          name="login-form"
+          layout="vertical"
+          onFinish={onFinish}
           className="form"
-          onSubmit={handleSubmit}
         >
-          <label htmlFor="username">Username:</label>
-          <input
-            className="form__input"
-            type="text"
-            id="username"
-            ref={userRef}
-            value={username}
-            onChange={handleUserInput}
-            autoComplete="off"
-            required
-          />
+          <Form.Item
+            label="Username"
+            name="username"
+            rules={[{ required: true, message: "Please enter your username" }]}
+          >
+            <Input
+              ref={userRef}
+              autoComplete="off"
+            />
+          </Form.Item>
 
-          <label htmlFor="password">Password:</label>
-          <input
-            className="form__input"
-            type="password"
-            id="password"
-            onChange={handlePwdInput}
-            value={password}
-            required
-          />
-          <button className="form__submit-button">Sign In</button>
-        </form>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Please enter your password" }]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="form__submit-button"
+              loading={isLoading}
+            >
+              Sign In
+            </Button>
+          </Form.Item>
+        </Form>
       </main>
       <footer>
         <Link to="/">Back to Home</Link>

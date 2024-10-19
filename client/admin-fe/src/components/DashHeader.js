@@ -51,7 +51,7 @@ const DashHeader = () => {
     <header className="dash-header">
       <div className={`dash-header__container ${dashClass}`}>
         <Link to="/dash">
-          <h1 className="dash-header__title">SMSales</h1>
+          <h1 className="dash-header__title">SMPost Dashboard</h1>
         </Link>
         <nav className="dash-header__nav">
           {/* add more buttons later */}
