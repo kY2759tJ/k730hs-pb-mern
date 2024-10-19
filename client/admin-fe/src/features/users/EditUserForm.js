@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { ROLES } from "../../config/enums";
-import { Form, Input, Checkbox, Select, Button, Tooltip, message } from "antd";
+import { Form, Input, Checkbox, Select, Button, Tooltip } from "antd";
 
 const NAME_REGEX = /^[a-zA-Z]+([ '-][a-zA-Z]+)*$/;
 const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/;

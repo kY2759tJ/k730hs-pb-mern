@@ -16,5 +16,5 @@ export const PostType = {
   LivePost: "Live Post",
 };
 
-// Define valid statuses
+// Define valid campaign statuses
 export const CampaignStatuses = { Active: "Active", Completed: "Completed" };

@@ -47,14 +47,6 @@ const NewCampaignForm = ({ campaigns }) => {
 
   const onFinish = async (values) => {
     const { user, status, title, social_media, post_type, post_url } = values;
-    console.log("Payload to send:", {
-      user,
-      status,
-      title,
-      social_media,
-      post_type,
-      post_url,
-    }); // Add this line for debugging
 
     try {
       await addNewCampaign({
