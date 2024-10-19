@@ -5,7 +5,9 @@ import NewCampaignForm from "./NewCampaignForm";
 const NewCampaign = () => {
   const users = useSelector(selectAllUsers);
 
-  const content = users ? <NewCampaignForm users={users} /> : <p>Loading...</p>;
+  if (!users?.length) return <p>Not Currently Available</p>;
+
+  const content = <NewCampaignForm users={users} />;
 
   return content;
 };
