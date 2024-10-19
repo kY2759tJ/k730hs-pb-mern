@@ -11,7 +11,7 @@ const CampaignsList = () => {
     isSuccess,
     isError,
     error,
-  } = useGetCampaignsQuery(undefined, {
+  } = useGetCampaignsQuery("campaignList", {
     pollingInterval: 15000,
     refetchOnFocus: true,
     refetchOnMountOrArgChange: true,

@@ -11,6 +11,7 @@ import NewUserForm from "./features/users/NewUserForm";
 import EditCampaign from "./features/campaigns/EditCampaign";
 import NewCampaign from "./features/campaigns/NewCampaign";
 import Prefetch from "./features/auth/Prefetch";
+import PersistLogin from "./features/auth/PersistLogin";
 
 function App() {
   return (
@@ -28,47 +29,49 @@ function App() {
           element={<Login />}
         />
 
-        <Route element={<Prefetch />}>
-          <Route
-            path="dash"
-            element={<DashLayout />}
-          >
+        <Route element={<PersistLogin />}>
+          <Route element={<Prefetch />}>
             <Route
-              index
-              element={<Welcome />}
-            />
-
-            <Route path="users">
+              path="dash"
+              element={<DashLayout />}
+            >
               <Route
                 index
-                element={<UsersList />}
+                element={<Welcome />}
               />
-              <Route
-                path=":id"
-                element={<EditUser />}
-              />
-              <Route
-                path="new"
-                element={<NewUserForm />}
-              />
-            </Route>
 
-            <Route path="campaigns">
-              <Route
-                index
-                element={<CampaignsList />}
-              />
-              <Route
-                path=":id"
-                element={<EditCampaign />}
-              />
-              <Route
-                path="new"
-                element={<NewCampaign />}
-              />
+              <Route path="users">
+                <Route
+                  index
+                  element={<UsersList />}
+                />
+                <Route
+                  path=":id"
+                  element={<EditUser />}
+                />
+                <Route
+                  path="new"
+                  element={<NewUserForm />}
+                />
+              </Route>
+
+              <Route path="campaigns">
+                <Route
+                  index
+                  element={<CampaignsList />}
+                />
+                <Route
+                  path=":id"
+                  element={<EditCampaign />}
+                />
+                <Route
+                  path="new"
+                  element={<NewCampaign />}
+                />
+              </Route>
             </Route>
+            {/* End Dash */}
           </Route>
-          {/* End Dash */}
         </Route>
       </Route>
     </Routes>

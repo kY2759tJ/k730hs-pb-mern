@@ -1,13 +1,16 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, Input, Checkbox, message } from "antd";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "./authSlice";
 import { useLoginMutation } from "./authApiSlice";
 
+import usePersist from "../../hooks/usePersist";
+
 const Login = () => {
   const userRef = useRef();
   const [errMsg, setErrMsg] = useState("");
+  const [persist, setPersist] = usePersist();
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -37,6 +40,8 @@ const Login = () => {
       message.error(errMsg); // Display error using Ant Design message
     }
   };
+
+  const onPersistChange = (e) => setPersist(e.target.checked);
 
   const errClass = errMsg ? "errmsg" : "offscreen";
 
@@ -79,6 +84,18 @@ const Login = () => {
             rules={[{ required: true, message: "Please enter your password" }]}
           >
             <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            name="persist"
+            valuePropName="checked"
+          >
+            <Checkbox
+              onChange={onPersistChange}
+              checked={persist}
+            >
+              Remember me
+            </Checkbox>
           </Form.Item>
 
           <Form.Item>
