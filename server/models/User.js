@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const USERROLES = ["Admin", "Salesperson"];
 
 const userSchema = new mongoose.Schema({
-  name: {
+  fullname: {
     type: String,
     required: true,
   },

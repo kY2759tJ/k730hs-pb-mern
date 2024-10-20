@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 import PulseLoader from "react-spinners/PulseLoader";
 
 // Utility function to capitalize names
-const capitalizeName = (name) =>
-  name
+const capitalizeName = (fullname) =>
+  fullname
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
@@ -40,9 +40,9 @@ const UsersList = React.memo(() => {
         ),
       },
       {
-        title: "Name",
-        key: "name",
-        dataIndex: "name",
+        title: "Full Name",
+        key: "fullname",
+        dataIndex: "fullname",
         render: (text) => <p>{text}</p>,
       },
       {
@@ -99,7 +99,7 @@ const UsersList = React.memo(() => {
           user && {
             key: userId, // Unique key for each row
             active: user.active,
-            name: capitalizeName(user.name),
+            fullname: capitalizeName(user.fullname),
             username: user.username,
             roles: user.roles,
             action: userId, // Used for navigation

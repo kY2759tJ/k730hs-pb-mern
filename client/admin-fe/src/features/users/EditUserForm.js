@@ -29,10 +29,10 @@ const EditUserForm = ({ user }) => {
   }, [isSuccess, isDelSuccess, navigate, form]);
 
   const onFinish = async (values) => {
-    const { name, username, password, roles, active } = values;
+    const { fullname, username, password, roles, active } = values;
     const payload = password
-      ? { id: user.id, name, username, password, roles, active }
-      : { id: user.id, name, username, roles, active };
+      ? { id: user.id, fullname, username, password, roles, active }
+      : { id: user.id, fullname, username, roles, active };
     await updateUser(payload);
   };
 
@@ -59,7 +59,7 @@ const EditUserForm = ({ user }) => {
         layout="vertical"
         onFinish={onFinish}
         initialValues={{
-          name: user.name,
+          fullname: user.fullname,
           username: user.username,
           roles: user.roles,
           active: user.active,
@@ -81,7 +81,7 @@ const EditUserForm = ({ user }) => {
 
         <Form.Item
           label="Name"
-          name="name"
+          name="fullname"
           rules={[
             { required: true, message: "Please enter a full name!" },
             { pattern: NAME_REGEX, message: "Name must be 3-20 letters." },

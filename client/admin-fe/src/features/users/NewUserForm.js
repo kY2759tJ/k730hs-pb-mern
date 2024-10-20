@@ -23,9 +23,10 @@ const NewUserForm = () => {
   }, [isSuccess, navigate, form]);
 
   const onFinish = async (values) => {
-    const { name, username, password, roles } = values;
+    const { fullname, username, password, roles } = values;
     try {
-      await addNewUser({ name, username, password, roles });
+      await addNewUser({ fullname, username, password, roles });
+      console.log(values);
       console.log("User added successfully");
     } catch (err) {
       console.error("Failed to add user:", err);
@@ -50,13 +51,16 @@ const NewUserForm = () => {
         layout="horizontal"
         style={{ maxWidth: 600 }}
         onFinish={onFinish}
+        initialValues={{
+          roles: ["Salesperson"], // Default roles
+        }}
       >
         <div className="form__title-row">
           <h2>New User</h2>
         </div>
 
         <Form.Item
-          name="name"
+          name="fullname"
           label="Name"
           rules={[
             { required: true, message: "Please input your full name!" },
@@ -94,10 +98,8 @@ const NewUserForm = () => {
         <Form.Item
           name="roles"
           label="Roles"
-          rules={[{ required: true, message: "Please select roles!" }]}
         >
           <Select
-            mode="multiple"
             placeholder="Select roles"
             style={{ width: "100%" }}
             options={options}
