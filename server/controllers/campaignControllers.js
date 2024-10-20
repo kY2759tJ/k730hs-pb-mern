@@ -19,7 +19,7 @@ const getAllCampaigns = async (req, res) => {
   const campaignsWithUser = await Promise.all(
     campaigns.map(async (campaign) => {
       const user = await User.findById(campaign.user).lean().exec();
-      return { ...campaign, username: user.username };
+      return { ...campaign, username: user.username, fullname: user.fullname };
     })
   );
 
