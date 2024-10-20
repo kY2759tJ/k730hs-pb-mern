@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAddNewCampaignMutation } from "./campaignsApiSlice";
 import { Form, Input, Button, Select } from "antd";
-
+import useAuth from "../../hooks/useAuth";
 import {
   SocialMediaType,
   PostType,
@@ -15,23 +15,24 @@ const urlValidationRule = {
   message: "Please enter a valid URL!",
 };
 
-const NewCampaignForm = ({ campaigns }) => {
+const NewCampaignForm = ({ users }) => {
+  const { userId } = useAuth();
+
   const [addNewCampaign, { isLoading, isSuccess, isError, error }] =
     useAddNewCampaignMutation();
 
   const [form] = Form.useForm(); // Create a form instance
-  const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
 
   // Simulate getting the user ID from session (e.g., API call or localStorage)
-  useEffect(() => {
-    const sessionUserId =
-      localStorage.getItem("userId") || "67123030c0fe0863752fe002"; // Replace with actual logic
-    console.log(sessionUserId);
-    setUserId(sessionUserId);
-  }, []);
+  // useEffect(() => {
+  //   const sessionUserId =
+  //     localStorage.getItem("userId") || "67123030c0fe0863752fe002"; // Replace with actual logic
+  //   console.log(sessionUserId);
+  //   setUserId(sessionUserId);
+  // }, []);
 
-  // Update the form field once userId is set
+  //Update the form field once userId is set
   useEffect(() => {
     if (userId) {
       form.setFieldsValue({ user: userId });
@@ -90,6 +91,7 @@ const NewCampaignForm = ({ campaigns }) => {
   const content = (
     <>
       <p className={errClass}>{errContent}</p>
+
       <Form
         form={form}
         labelCol={{ span: 4 }}

@@ -7,9 +7,13 @@ const useAuth = () => {
   let isManager = false;
   let isAdmin = false;
   let status = "Salesperson";
+  let userId = null;
 
   if (token) {
     const decoded = jwtDecode(token);
+
+    // Extracting the userId from decoded token
+    userId = decoded.UserInfo.id; // MongoDB ObjectId
     const { username, roles } = decoded.UserInfo;
 
     isManager = roles.includes("Manager");
@@ -18,9 +22,9 @@ const useAuth = () => {
     if (isManager) status = "Manager";
     if (isAdmin) status = "Admin";
 
-    return { username, roles, status, isManager, isAdmin };
+    return { userId, username, roles, status, isManager, isAdmin };
   }
 
-  return { username: "", roles: [], isManager, isAdmin, status };
+  return { userId, username: "", roles: [], isManager, isAdmin, status };
 };
 export default useAuth;
