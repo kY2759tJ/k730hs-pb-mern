@@ -7,7 +7,7 @@ import { Outlet } from "react-router-dom";
 const Prefetch = () => {
   useEffect(() => {
     store.dispatch(
-      campaignsApiSlice.util.prefetch("getCampaigns", "campaignList", {
+      campaignsApiSlice.util.prefetch("getCampaigns", "campaignsList", {
         force: true,
       })
     );

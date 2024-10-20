@@ -1,3 +1,4 @@
+import React, { useMemo } from "react";
 import { useGetCampaignsQuery } from "./campaignsApiSlice";
 import { Space, Table, Tag, Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
@@ -5,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import PulseLoader from "react-spinners/PulseLoader";
 
-const CampaignsList = () => {
+const CampaignsList = React.memo(() => {
   const { username, isManager, isAdmin } = useAuth();
 
   const {
@@ -14,7 +15,7 @@ const CampaignsList = () => {
     isSuccess,
     isError,
     error,
-  } = useGetCampaignsQuery("campaignList", {
+  } = useGetCampaignsQuery("campaignsList", {
     pollingInterval: 15000,
     refetchOnFocus: true,
     refetchOnMountOrArgChange: true,
@@ -22,26 +23,8 @@ const CampaignsList = () => {
 
   const navigate = useNavigate();
 
-  let content;
-
-  if (isLoading) content = <PulseLoader color={"#FFF"} />;
-
-  if (isError) {
-    content = <p className="errmsg">{error?.data?.message}</p>;
-  }
-
-  if (isSuccess) {
-    const { ids, entities } = campaigns;
-
-    let filteredIds;
-    if (isManager || isAdmin) {
-      filteredIds = [...ids];
-    } else {
-      filteredIds = ids.filter(
-        (campaignId) => entities[campaignId].username === username
-      );
-    }
-    const columns = [
+  const columns = useMemo(
+    () => [
       {
         title: "Status",
         key: "status",
@@ -72,7 +55,7 @@ const CampaignsList = () => {
         title: "Post URL",
         dataIndex: "post_url",
         key: "post_url",
-        render: (text) => <a>{text}</a>,
+        render: (text) => <a href={text}>{text}</a>, // Added href for proper link
       },
       {
         title: "Action",
@@ -88,28 +71,44 @@ const CampaignsList = () => {
           </Space>
         ),
       },
-    ];
+    ],
+    [navigate] // Dependencies for memoization
+  );
 
-    const dataSource = ids?.length
-      ? filteredIds
-          .map((campaignId) => {
-            const campaign = campaigns.entities[campaignId];
-            if (campaign) {
-              return {
-                key: campaignId, // Unique key for each row
-                status: campaign.status,
-                title: campaign.title,
-                social_media: campaign.social_media,
-                post_type: campaign.post_type,
-                post_url: campaign.post_url,
-                action: campaignId, // Placeholder for action column (e.g., for edit button)
-              };
-            }
-            return null; // Explicitly return null if campaign is not found
-          })
-          .filter(Boolean) // Remove null values
-      : [];
+  const dataSource = useMemo(() => {
+    if (!isSuccess) return [];
+    const { ids, entities } = campaigns;
 
+    const filteredIds =
+      isManager || isAdmin
+        ? ids
+        : ids.filter((id) => entities[id].username === username);
+
+    return filteredIds
+      .map((id) => {
+        const campaign = entities[id];
+        return (
+          campaign && {
+            key: id,
+            status: campaign.status,
+            title: campaign.title,
+            social_media: campaign.social_media,
+            post_type: campaign.post_type,
+            post_url: campaign.post_url,
+            action: id,
+          }
+        );
+      })
+      .filter(Boolean); // Remove null values
+  }, [campaigns, isManager, isAdmin, isSuccess, username]);
+
+  let content;
+
+  if (isLoading) {
+    content = <PulseLoader color={"#FFF"} />;
+  } else if (isError) {
+    content = <p className="errmsg">{error?.data?.message}</p>;
+  } else {
     content = (
       <Table
         columns={columns}
@@ -119,5 +118,6 @@ const CampaignsList = () => {
   }
 
   return content;
-};
+});
+
 export default CampaignsList;
