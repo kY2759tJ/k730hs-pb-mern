@@ -1,15 +1,25 @@
 import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import {
+  faFileCirclePlus,
+  faFilePen,
+  faUserGear,
+  faUserPlus,
+  faRightFromBracket,
+} from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 
 import { useSendLogoutMutation } from "../features/auth/authApiSlice";
 
+import useAuth from "../hooks/useAuth";
+
 const DASH_REGEX = /^\/dash(\/)?$/;
-const NOTES_REGEX = /^\/dash\/notes(\/)?$/;
+const NOTES_REGEX = /^\/dash\/campaigns(\/)?$/;
 const USERS_REGEX = /^\/dash\/users(\/)?$/;
 
 const DashHeader = () => {
+  const { isManager, isAdmin } = useAuth();
+
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -17,16 +27,13 @@ const DashHeader = () => {
     useSendLogoutMutation();
 
   useEffect(() => {
-    console.log("Logout Success:", isSuccess);
-    if (isSuccess) {
-      console.log("Navigating to /");
-      navigate("/");
-    }
+    if (isSuccess) navigate("/");
   }, [isSuccess, navigate]);
 
-  if (isLoading) return <p>Logging Out...</p>;
-
-  if (isError) return <p>Error: {error.data?.message}</p>;
+  const onNewCampaignClicked = () => navigate("/dash/campaigns/new");
+  const onNewUserClicked = () => navigate("/dash/users/new");
+  const onCampaignsClicked = () => navigate("/dash/campaigns");
+  const onUsersClicked = () => navigate("/dash/users");
 
   let dashClass = null;
   if (
@@ -35,6 +42,60 @@ const DashHeader = () => {
     !USERS_REGEX.test(pathname)
   ) {
     dashClass = "dash-header__container--small";
+  }
+
+  let newCampaignButton = null;
+  if (NOTES_REGEX.test(pathname)) {
+    newCampaignButton = (
+      <button
+        className="icon-button"
+        title="New Campaign"
+        onClick={onNewCampaignClicked}
+      >
+        <FontAwesomeIcon icon={faFileCirclePlus} />
+      </button>
+    );
+  }
+
+  let newUserButton = null;
+  if (USERS_REGEX.test(pathname)) {
+    newUserButton = (
+      <button
+        className="icon-button"
+        title="New User"
+        onClick={onNewUserClicked}
+      >
+        <FontAwesomeIcon icon={faUserPlus} />
+      </button>
+    );
+  }
+
+  let userButton = null;
+  if (isManager || isAdmin) {
+    if (!USERS_REGEX.test(pathname) && pathname.includes("/dash")) {
+      userButton = (
+        <button
+          className="icon-button"
+          title="Users"
+          onClick={onUsersClicked}
+        >
+          <FontAwesomeIcon icon={faUserGear} />
+        </button>
+      );
+    }
+  }
+
+  let campaignsButton = null;
+  if (!NOTES_REGEX.test(pathname) && pathname.includes("/dash")) {
+    campaignsButton = (
+      <button
+        className="icon-button"
+        title="Campaigns"
+        onClick={onCampaignsClicked}
+      >
+        <FontAwesomeIcon icon={faFilePen} />
+      </button>
+    );
   }
 
   const logoutButton = (
@@ -47,18 +108,36 @@ const DashHeader = () => {
     </button>
   );
 
+  const errClass = isError ? "errmsg" : "offscreen";
+
+  let buttonContent;
+  if (isLoading) {
+    buttonContent = <p>Logging Out...</p>;
+  } else {
+    buttonContent = (
+      <>
+        {newCampaignButton}
+        {newUserButton}
+        {campaignsButton}
+        {userButton}
+        {logoutButton}
+      </>
+    );
+  }
+
   const content = (
-    <header className="dash-header">
-      <div className={`dash-header__container ${dashClass}`}>
-        <Link to="/dash">
-          <h1 className="dash-header__title">SMPost Dashboard</h1>
-        </Link>
-        <nav className="dash-header__nav">
-          {/* add more buttons later */}
-          {logoutButton}
-        </nav>
-      </div>
-    </header>
+    <>
+      <p className={errClass}>{error?.data?.message}</p>
+
+      <header className="dash-header">
+        <div className={`dash-header__container ${dashClass}`}>
+          <Link to="/dash">
+            <h1 className="dash-header__title">techCampaigns</h1>
+          </Link>
+          <nav className="dash-header__nav">{buttonContent}</nav>
+        </div>
+      </header>
+    </>
   );
 
   return content;

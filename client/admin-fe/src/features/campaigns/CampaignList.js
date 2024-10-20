@@ -3,8 +3,11 @@ import { useGetCampaignsQuery } from "./campaignsApiSlice";
 import { Space, Table, Tag, Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 
 const CampaignsList = () => {
+  const { id, username, isManager, isAdmin } = useAuth();
+
   const {
     data: campaigns,
     isLoading,
@@ -28,8 +31,16 @@ const CampaignsList = () => {
   }
 
   if (isSuccess) {
-    const { ids } = campaigns;
+    const { ids, entities } = campaigns;
 
+    let filteredIds;
+    if (isManager || isAdmin) {
+      filteredIds = [...ids];
+    } else {
+      filteredIds = ids.filter(
+        (campaignId) => entities[campaignId].username === username
+      );
+    }
     const columns = [
       {
         title: "Status",
@@ -80,7 +91,7 @@ const CampaignsList = () => {
     ];
 
     const dataSource = ids?.length
-      ? ids
+      ? filteredIds
           .map((campaignId) => {
             const campaign = campaigns.entities[campaignId];
             if (campaign) {

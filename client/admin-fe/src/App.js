@@ -12,6 +12,8 @@ import EditCampaign from "./features/campaigns/EditCampaign";
 import NewCampaign from "./features/campaigns/NewCampaign";
 import Prefetch from "./features/auth/Prefetch";
 import PersistLogin from "./features/auth/PersistLogin";
+import { ROLES } from "./config/enums";
+import RequireAuth from "./features/auth/RequireAuth";
 
 function App() {
   return (
@@ -20,6 +22,7 @@ function App() {
         path="/"
         element={<Layout />}
       >
+        {/* Public routes*/}
         <Route
           index
           element={<Public />}
@@ -29,49 +32,56 @@ function App() {
           element={<Login />}
         />
 
+        {/* Proctected routes */}
         <Route element={<PersistLogin />}>
-          <Route element={<Prefetch />}>
-            <Route
-              path="dash"
-              element={<DashLayout />}
-            >
+          <Route
+            element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}
+          >
+            <Route element={<Prefetch />}>
               <Route
-                index
-                element={<Welcome />}
-              />
-
-              <Route path="users">
+                path="dash"
+                element={<DashLayout />}
+              >
                 <Route
                   index
-                  element={<UsersList />}
+                  element={<Welcome />}
                 />
-                <Route
-                  path=":id"
-                  element={<EditUser />}
-                />
-                <Route
-                  path="new"
-                  element={<NewUserForm />}
-                />
-              </Route>
+                <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
+                  <Route path="users">
+                    <Route
+                      index
+                      element={<UsersList />}
+                    />
+                    <Route
+                      path=":id"
+                      element={<EditUser />}
+                    />
+                    <Route
+                      path="new"
+                      element={<NewUserForm />}
+                    />
+                  </Route>
+                </Route>
 
-              <Route path="campaigns">
-                <Route
-                  index
-                  element={<CampaignsList />}
-                />
-                <Route
-                  path=":id"
-                  element={<EditCampaign />}
-                />
-                <Route
-                  path="new"
-                  element={<NewCampaign />}
-                />
+                <Route path="campaigns">
+                  <Route
+                    index
+                    element={<CampaignsList />}
+                  />
+                  <Route
+                    path=":id"
+                    element={<EditCampaign />}
+                  />
+                  <Route
+                    path="new"
+                    element={<NewCampaign />}
+                  />
+                </Route>
               </Route>
+              {/* End Dash */}
             </Route>
-            {/* End Dash */}
           </Route>
+          {/* End Protected routes*/}
         </Route>
       </Route>
     </Routes>
