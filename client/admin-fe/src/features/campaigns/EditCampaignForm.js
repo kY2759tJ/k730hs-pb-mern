@@ -138,7 +138,7 @@ const EditCampaignForm = ({ campaign, users }) => {
             <p className="form__created">
               Sales Person:
               <br />
-              {campaign.name}
+              {campaign.fullname}
             </p>
           </Col>
           <Col span={12}>

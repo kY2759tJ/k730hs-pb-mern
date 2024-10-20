@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAddNewCampaignMutation } from "./campaignsApiSlice";
-import { Form, Input, Button, Select } from "antd";
+import { Form, Input, Button, Select, Divider } from "antd";
 import useAuth from "../../hooks/useAuth";
 import {
   SocialMediaType,
@@ -101,16 +101,21 @@ const NewCampaignForm = ({ users }) => {
         onFinish={onFinish}
       >
         <div className="form__title-row">
-          <h2>New Campaign</h2>
+          <h2>Add New Campaign</h2>
         </div>
 
-        <Form.Item name="user">
-          <Input type="" />
+        <Divider />
+
+        <Form.Item
+          name="user"
+          hidden
+        >
+          <Input type="hidden" />
         </Form.Item>
 
         <Form.Item
           name="status"
-          label="Campaign Status"
+          label="Status"
           rules={[
             { required: true, message: "Please select a campaign status!" },
           ]}
