@@ -1,11 +1,10 @@
 const Campaign = require("../models/Campaign");
 const User = require("../models/User");
-const asyncHandler = require("express-async-handler");
 
 //@desc Get all campaign
 //@route Get /campaign
 //@access Private
-const getAllCampaigns = asyncHandler(async (req, res) => {
+const getAllCampaigns = async (req, res) => {
   //Get all campaigns
   const campaigns = await Campaign.find().lean();
 
@@ -25,12 +24,12 @@ const getAllCampaigns = asyncHandler(async (req, res) => {
   );
 
   res.status(200).json(campaignsWithUser);
-});
+};
 
 //@desc Create new campaign
 //@route POST /campaign
 //@access Private
-const createNewCampaign = asyncHandler(async (req, res) => {
+const createNewCampaign = async (req, res) => {
   const { user, status, title, social_media, post_type, post_url } = req.body;
 
   if (!user || !status || !title || !social_media || !post_type || !post_url) {
@@ -40,7 +39,10 @@ const createNewCampaign = asyncHandler(async (req, res) => {
   }
 
   //Check for duplicated campaign title, if duplicates found, return 409 conflicts
-  const duplicate = await Campaign.findOne({ title }).lean().exec();
+  const duplicate = await Campaign.findOne({ title })
+    .collation({ locale: "en", strength: 2 })
+    .lean()
+    .exec();
 
   if (duplicate) {
     return res.status(409).json({ message: "Duplicate campaign title" });
@@ -62,12 +64,12 @@ const createNewCampaign = asyncHandler(async (req, res) => {
   } else {
     res.status(400).json({ message: `Invalid campaign data received` });
   }
-});
+};
 
 //@desc Update campaign
 //@route PATCH /campaign
 //@access Private
-const updateCampaign = asyncHandler(async (req, res) => {
+const updateCampaign = async (req, res) => {
   const { id, status, title, social_media, post_type, post_url } = req.body;
 
   if (!id || !status || !title || !social_media || !post_type || !post_url) {
@@ -82,7 +84,10 @@ const updateCampaign = asyncHandler(async (req, res) => {
   }
 
   //Check if campaign title duplicate
-  const duplicate = await Campaign.findOne({ title }).lean().exec();
+  const duplicate = await Campaign.findOne({ title })
+    .collation({ locale: "en", strength: 2 })
+    .lean()
+    .exec();
 
   //Allow renaming of the original campaign
   if (duplicate && duplicate?._id.toString() !== id) {
@@ -98,12 +103,12 @@ const updateCampaign = asyncHandler(async (req, res) => {
   const updatedCampaign = await campaign.save();
 
   res.json(`'${updatedCampaign.title}' updated`);
-});
+};
 
 //@desc Delete campaign
 //@route DELETE /campaign
 //@access Private
-const deleteCampaign = asyncHandler(async (req, res) => {
+const deleteCampaign = async (req, res) => {
   const { id } = req.body;
 
   if (!id) {
@@ -127,7 +132,7 @@ const deleteCampaign = asyncHandler(async (req, res) => {
   const reply = `Campaign ${title} with ID ${_id} deleted`;
 
   res.json(reply);
-});
+};
 
 module.exports = {
   getAllCampaigns,

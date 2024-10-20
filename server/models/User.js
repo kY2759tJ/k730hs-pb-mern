@@ -16,13 +16,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  roles: [
-    {
-      type: String,
-      enum: USERROLES,
-      default: "Salesperson",
-    },
-  ],
+  roles: {
+    type: [String],
+    enum: USERROLES,
+    default: ["Salesperson"],
+  },
   active: {
     type: Boolean,
     default: true,
