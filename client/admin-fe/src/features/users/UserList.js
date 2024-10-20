@@ -2,6 +2,8 @@ import { useGetUsersQuery } from "./usersApiSlice";
 import { Space, Table, Tag, Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import PulseLoader from "react-spinners/PulseLoader";
+
 // Utility function
 const capitalizeName = (name) => {
   return name
@@ -26,7 +28,7 @@ const UserList = () => {
 
   let content;
 
-  if (isLoading) content = <p>Loading...</p>;
+  if (isLoading) content = <PulseLoader color={"#FFF"} />;
 
   if (isError) {
     content = <p className="errmsg">{error?.data?.message}</p>;

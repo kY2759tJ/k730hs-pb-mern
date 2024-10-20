@@ -8,10 +8,12 @@ const initialState = campaignsAdapter.getInitialState();
 export const campaignsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getCampaigns: builder.query({
-      query: () => "/campaigns",
-      validateStatus: (response, result) => {
-        return response.status === 200 && !result.isError;
-      },
+      query: () => ({
+        url: "/campaigns",
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError;
+        },
+      }),
       transformResponse: (responseData) => {
         const loadedCampaigns = responseData.map((campaign) => {
           campaign.id = campaign._id;

@@ -1,12 +1,12 @@
 import { useGetCampaignsQuery } from "./campaignsApiSlice";
-//import Campaign from "./Campaign";
 import { Space, Table, Tag, Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import PulseLoader from "react-spinners/PulseLoader";
 
 const CampaignsList = () => {
-  const { id, username, isManager, isAdmin } = useAuth();
+  const { username, isManager, isAdmin } = useAuth();
 
   const {
     data: campaigns,
@@ -24,7 +24,7 @@ const CampaignsList = () => {
 
   let content;
 
-  if (isLoading) content = <p>Loading...</p>;
+  if (isLoading) content = <PulseLoader color={"#FFF"} />;
 
   if (isError) {
     content = <p className="errmsg">{error?.data?.message}</p>;
