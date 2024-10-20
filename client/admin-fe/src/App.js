@@ -14,8 +14,10 @@ import Prefetch from "./features/auth/Prefetch";
 import PersistLogin from "./features/auth/PersistLogin";
 import { ROLES } from "./config/enums";
 import RequireAuth from "./features/auth/RequireAuth";
+import useTitle from "./hooks/useTitle";
 
 function App() {
+  useTitle("SMPost Dashboard");
   return (
     <Routes>
       <Route
