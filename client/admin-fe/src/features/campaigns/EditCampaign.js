@@ -11,7 +11,7 @@ const EditCampaign = () => {
 
   const { id } = useParams();
 
-  const { username, isManager, isAdmin } = useAuth();
+  const { username, isAdmin } = useAuth();
 
   const { campaign } = useGetCampaignsQuery("campaignsList", {
     selectFromResult: ({ data }) => ({
@@ -27,7 +27,7 @@ const EditCampaign = () => {
 
   if (!campaign || !users?.length) return <PulseLoader color={"#FFF"} />;
 
-  if (!isManager && !isAdmin) {
+  if (!isAdmin) {
     if (campaign.username !== username) {
       return <p className="errmsg">No access</p>;
     }

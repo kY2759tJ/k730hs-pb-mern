@@ -7,7 +7,7 @@ import useAuth from "../../hooks/useAuth";
 import PulseLoader from "react-spinners/PulseLoader";
 
 const CampaignsList = React.memo(() => {
-  const { username, isManager, isAdmin } = useAuth();
+  const { username, isAdmin } = useAuth();
 
   const {
     data: campaigns,
@@ -79,10 +79,9 @@ const CampaignsList = React.memo(() => {
     if (!isSuccess) return [];
     const { ids, entities } = campaigns;
 
-    const filteredIds =
-      isManager || isAdmin
-        ? ids
-        : ids.filter((id) => entities[id].username === username);
+    const filteredIds = isAdmin
+      ? ids
+      : ids.filter((id) => entities[id].username === username);
 
     return filteredIds
       .map((id) => {
@@ -100,7 +99,7 @@ const CampaignsList = React.memo(() => {
         );
       })
       .filter(Boolean); // Remove null values
-  }, [campaigns, isManager, isAdmin, isSuccess, username]);
+  }, [campaigns, isAdmin, isSuccess, username]);
 
   let content;
 
