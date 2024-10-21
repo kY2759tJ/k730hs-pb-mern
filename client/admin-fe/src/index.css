@@ -379,3 +379,7 @@ h2 {
 input.ant-input.ant-input-disabled.css-dev-only-do-not-override-1hpnbz2.ant-input-outlined {
   background-color: #ffffff;
 }
+
+:where(.css-dev-only-do-not-override-1hpnbz2).ant-form {
+  color: white;
+}

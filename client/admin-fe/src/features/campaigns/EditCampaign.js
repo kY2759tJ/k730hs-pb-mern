@@ -1,24 +1,44 @@
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { selectCampaignById } from "./campaignsApiSlice";
-import { selectAllUsers } from "../users/usersApiSlice";
 import EditCampaignForm from "./EditCampaignForm";
+import { useGetCampaignsQuery } from "./campaignsApiSlice";
+import { useGetUsersQuery } from "../users/usersApiSlice";
+import useAuth from "../../hooks/useAuth";
+import PulseLoader from "react-spinners/PulseLoader";
+import useTitle from "../../hooks/useTitle";
 
 const EditCampaign = () => {
+  useTitle("SMPost: Edit Campaign");
+
   const { id } = useParams();
 
-  const campaign = useSelector((state) => selectCampaignById(state, id));
-  const users = useSelector(selectAllUsers);
+  const { username, isManager, isAdmin } = useAuth();
 
-  const content =
-    campaign && users ? (
-      <EditCampaignForm
-        campaign={campaign}
-        users={users}
-      />
-    ) : (
-      <p>Loading...</p>
-    );
+  const { campaign } = useGetCampaignsQuery("campaignsList", {
+    selectFromResult: ({ data }) => ({
+      campaign: data?.entities[id],
+    }),
+  });
+
+  const { users } = useGetUsersQuery("usersList", {
+    selectFromResult: ({ data }) => ({
+      users: data?.ids.map((id) => data?.entities[id]),
+    }),
+  });
+
+  if (!campaign || !users?.length) return <PulseLoader color={"#FFF"} />;
+
+  if (!isManager && !isAdmin) {
+    if (campaign.username !== username) {
+      return <p className="errmsg">No access</p>;
+    }
+  }
+
+  const content = (
+    <EditCampaignForm
+      campaign={campaign}
+      users={users}
+    />
+  );
 
   return content;
 };

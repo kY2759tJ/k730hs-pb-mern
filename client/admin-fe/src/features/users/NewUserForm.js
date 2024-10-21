@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAddNewUserMutation } from "./usersApiSlice";
 import { useNavigate } from "react-router-dom";
-import { ROLES } from "../../config/roles";
+import { ROLES } from "../../config/enums";
 import { Form, Input, Button, Select } from "antd";
 
 const NAME_REGEX = /^[a-zA-Z]+([ '-][a-zA-Z]+)*$/;
@@ -23,9 +23,10 @@ const NewUserForm = () => {
   }, [isSuccess, navigate, form]);
 
   const onFinish = async (values) => {
-    const { name, username, password, roles } = values;
+    const { fullname, username, password, roles } = values;
     try {
-      await addNewUser({ name, username, password, roles });
+      await addNewUser({ fullname, username, password, roles });
+      console.log(values);
       console.log("User added successfully");
     } catch (err) {
       console.error("Failed to add user:", err);
@@ -50,12 +51,16 @@ const NewUserForm = () => {
         layout="horizontal"
         style={{ maxWidth: 600 }}
         onFinish={onFinish}
+        initialValues={{
+          roles: ["Salesperson"], // Default roles
+        }}
       >
         <div className="form__title-row">
           <h2>New User</h2>
         </div>
+
         <Form.Item
-          name="name"
+          name="fullname"
           label="Name"
           rules={[
             { required: true, message: "Please input your full name!" },
@@ -64,6 +69,7 @@ const NewUserForm = () => {
         >
           <Input placeholder="Full Name" />
         </Form.Item>
+
         <Form.Item
           name="username"
           label="Username"
@@ -74,6 +80,7 @@ const NewUserForm = () => {
         >
           <Input placeholder="[3-20 letters]" />
         </Form.Item>
+
         <Form.Item
           name="password"
           label="Password"
@@ -87,18 +94,18 @@ const NewUserForm = () => {
             placeholder="Password"
           />
         </Form.Item>
+
         <Form.Item
           name="roles"
           label="Roles"
-          rules={[{ required: true, message: "Please select roles!" }]}
         >
           <Select
-            mode="multiple"
             placeholder="Select roles"
             style={{ width: "100%" }}
             options={options}
           ></Select>
         </Form.Item>
+
         <div className="form__action-buttons">
           <Button
             type="primary"

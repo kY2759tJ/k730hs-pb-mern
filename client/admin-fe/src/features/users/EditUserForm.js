@@ -3,11 +3,10 @@ import { useUpdateUserMutation, useDeleteUserMutation } from "./usersApiSlice";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faTrashCan } from "@fortawesome/free-solid-svg-icons";
-import { ROLES } from "../../config/roles";
-import { Form, Input, Checkbox, Select, Button, Tooltip, message } from "antd";
+import { ROLES } from "../../config/enums";
+import { Form, Input, Checkbox, Select, Button, Tooltip } from "antd";
 
 const NAME_REGEX = /^[a-zA-Z]+([ '-][a-zA-Z]+)*$/;
-const USER_REGEX = /^[A-z]{3,20}$/;
 const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/;
 
 const EditUserForm = ({ user }) => {
@@ -30,10 +29,10 @@ const EditUserForm = ({ user }) => {
   }, [isSuccess, isDelSuccess, navigate, form]);
 
   const onFinish = async (values) => {
-    const { name, username, password, roles, active } = values;
+    const { fullname, username, password, roles, active } = values;
     const payload = password
-      ? { id: user.id, name, username, password, roles, active }
-      : { id: user.id, name, username, roles, active };
+      ? { id: user.id, fullname, username, password, roles, active }
+      : { id: user.id, fullname, username, roles, active };
     await updateUser(payload);
   };
 
@@ -60,7 +59,7 @@ const EditUserForm = ({ user }) => {
         layout="vertical"
         onFinish={onFinish}
         initialValues={{
-          name: user.name,
+          fullname: user.fullname,
           username: user.username,
           roles: user.roles,
           active: user.active,
@@ -82,7 +81,7 @@ const EditUserForm = ({ user }) => {
 
         <Form.Item
           label="Name"
-          name="name"
+          name="fullname"
           rules={[
             { required: true, message: "Please enter a full name!" },
             { pattern: NAME_REGEX, message: "Name must be 3-20 letters." },
