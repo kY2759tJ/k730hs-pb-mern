@@ -38,6 +38,8 @@ const EditOrderForm = ({ order, users }) => {
   const [form] = Form.useForm(); // Create a form instance
   const navigate = useNavigate();
   const [items, setItems] = useState(order.itemsWithProductNames);
+  const [showAddItem, setShowAddItem] = useState(false); // State for showing the add item section
+  const [selectedProduct, setSelectedProduct] = useState(null); // State for selected product
 
   // Calculate total amount from items
   const calculateTotalAmount = () => {
@@ -72,15 +74,24 @@ const EditOrderForm = ({ order, users }) => {
     form.setFieldsValue({ totalAmount: calculateTotalAmount() });
   };
 
-  // Add a new item
+  // Toggle the visibility of the add item section
+  const toggleAddItem = () => {
+    setShowAddItem((prev) => !prev);
+  };
+
+  // Handle adding a new item
   const addItem = () => {
+    if (!selectedProduct) return; // Ensure a product is selected
+
     const newItem = {
-      product: "", // Assume product selection will be handled
+      product: selectedProduct.id, // Store product ID
       quantity: 1,
-      totalPrice: 0,
-      productName: "New Product",
+      total_price: selectedProduct.price, // Set total price based on selected product
+      productName: selectedProduct.name,
     };
+
     setItems([...items, newItem]);
+    setSelectedProduct(null); // Reset the selected product after adding
   };
 
   const onFinish = async (values) => {
@@ -145,6 +156,13 @@ const EditOrderForm = ({ order, users }) => {
       label: order_status_option,
     })
   );
+
+  // Sample product data
+  const products = [
+    { id: "6715e7bc51ec8fb709580a7d", name: "Pokeball V1.2", price: 21 },
+    { id: "6715ea1b3a51185197b334ce", name: "Pokeball V2.2", price: 42 },
+    // Add more products as needed
+  ];
 
   // Columns for the items table
   const columns = [
@@ -327,7 +345,12 @@ const EditOrderForm = ({ order, users }) => {
             span={6}
             style={{ marginTop: "1em" }}
           >
-            <Button onClick={addItem}>Add Product</Button>
+            <Button
+              type="primary"
+              onClick={toggleAddItem}
+            >
+              {showAddItem ? "Hide Add Product" : "Add Product"}
+            </Button>
           </Col>
 
           <Col
@@ -347,6 +370,48 @@ const EditOrderForm = ({ order, users }) => {
             </FormItem>
           </Col>
         </Row>
+        {showAddItem && (
+          <div>
+            <h3>Add New Item</h3>
+            <Row>
+              <Col flex="auto">
+                <Form.Item
+                  label="Select Product"
+                  maxWidth="100%"
+                >
+                  <Select
+                    maxWidth="100%"
+                    onChange={(productId) =>
+                      setSelectedProduct(
+                        products.find((p) => p.id === productId)
+                      )
+                    }
+                    placeholder="Select a product"
+                  >
+                    {products.map((product) => (
+                      <option
+                        key={product.id}
+                        value={product.id}
+                      >
+                        {product.name}
+                      </option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col flex="40px">
+                <Button
+                  type="primary"
+                  onClick={addItem}
+                  disabled={!selectedProduct}
+                >
+                  Add Item
+                </Button>
+              </Col>
+            </Row>
+          </div>
+        )}
+
         <Divider
           orientation="left"
           style={{ color: "#ffffff", borderColor: "#ffffff" }}
