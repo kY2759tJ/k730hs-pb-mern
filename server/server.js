@@ -31,6 +31,8 @@ app.use("/", require("./routes/root"));
 app.use("/auth", require("./routes/authRoutes"));
 app.use("/users", require("./routes/userRoutes"));
 app.use("/campaigns", require("./routes/campaignRoutes"));
+app.use("/products", require("./routes/productRoutes"));
+app.use("/orders", require("./routes/orderRoutes"));
 
 app.all("*", (req, res) => {
   res.status(404);

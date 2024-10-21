@@ -1,0 +1,26 @@
+{
+  "user": "67150d5f236acba541a27f07",
+  "campaign": "67150d5f236acba541a27f07",
+  "customer": {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "contact": "+1234567890",
+    "platform": "facebook",
+    "accountId": "john.doe.123",
+    "profileUrl": "https://facebook.com/john.doe.123"
+  },
+  "items": [
+    {
+      "product": "6715e7bc51ec8fb709580a7d",
+      "quantity": 1,
+      "total_price": 21.0
+    },
+    {
+      "product": "6715ea1b3a51185197b334ce",
+      "quantity": 1,
+      "total_price": 42.0
+    }
+  ],
+  "totalAmount": 63.0,
+  "status": "Draft"
+}

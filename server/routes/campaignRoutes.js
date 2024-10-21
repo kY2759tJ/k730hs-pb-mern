@@ -3,7 +3,7 @@ const router = express.Router();
 const campaignController = require("../controllers/campaignControllers");
 const verifyJWT = require("../middleware/verifyJWT");
 
-router.use(verifyJWT);
+//router.use(verifyJWT);
 
 router
   .route("/")
