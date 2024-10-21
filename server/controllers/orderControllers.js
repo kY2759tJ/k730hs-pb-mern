@@ -31,6 +31,7 @@ const getAllOrders = async (req, res) => {
           return {
             ...item,
             productName: product?.productName || "Unknown Product", // Add product name
+            productBasePrice: product?.basePrice, // Add product name
           };
         })
       );

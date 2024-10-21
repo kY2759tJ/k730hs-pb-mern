@@ -383,3 +383,19 @@ input.ant-input.ant-input-disabled.css-dev-only-do-not-override-1hpnbz2.ant-inpu
 :where(.css-dev-only-do-not-override-1hpnbz2).ant-form {
   color: white;
 }
+
+:where(.css-dev-only-do-not-override-1hpnbz2).ant-row {
+  display: flex;
+  flex-flow: row wrap;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+:where(.css-dev-only-do-not-override-1hpnbz2).ant-form-item
+  .ant-form-item-label {
+  flex-grow: 0;
+  overflow: visible;
+  white-space: nowrap;
+  text-align: end;
+  vertical-align: middle;
+}

@@ -13,12 +13,12 @@
     {
       "product": "6715e7bc51ec8fb709580a7d",
       "quantity": 1,
-      "total_price": 21.0
+      "totalPrice": 21.0
     },
     {
       "product": "6715ea1b3a51185197b334ce",
       "quantity": 1,
-      "total_price": 42.0
+      "totalPrice": 42.0
     }
   ],
   "totalAmount": 63.0,

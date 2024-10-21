@@ -21,7 +21,7 @@ const orderItemSchema = new mongoose.Schema({
     required: true,
     min: 1,
   },
-  total_price: {
+  totalPrice: {
     type: Number,
     required: true,
     min: 1,
@@ -45,7 +45,7 @@ const customerSchema = new mongoose.Schema({
   },
   platform: {
     type: String,
-    enum: ["facebook", "instagram", "twitter", "linkedIn"],
+    enum: ["Facebook", "Instagram"],
     required: true,
   },
   accountId: {
