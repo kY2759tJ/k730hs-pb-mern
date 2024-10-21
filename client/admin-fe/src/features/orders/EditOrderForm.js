@@ -83,10 +83,11 @@ const EditOrderForm = ({ order, users }) => {
   const addItem = () => {
     if (!selectedProduct) return; // Ensure a product is selected
 
+    const totalPrice = 1 * (selectedProduct.name ? selectedProduct.price : 0);
     const newItem = {
       product: selectedProduct.id, // Store product ID
       quantity: 1,
-      total_price: selectedProduct.price, // Set total price based on selected product
+      totalPrice: totalPrice, // Set total price based on selected product
       productName: selectedProduct.name,
     };
 
