@@ -1,7 +1,21 @@
-import React from "react";
+import NewProductForm from "./NewProductForm";
+import { useGetUsersQuery } from "../users/usersApiSlice";
+import PulseLoader from "react-spinners/PulseLoader";
+import useTitle from "../../hooks/useTitle";
 
 const NewProduct = () => {
-  return <div>NewProduct</div>;
-};
+  useTitle("SMPost: New Product");
 
+  const { users } = useGetUsersQuery("usersList", {
+    selectFromResult: ({ data }) => ({
+      users: data?.ids.map((id) => data?.entities[id]),
+    }),
+  });
+
+  if (!users?.length) return <PulseLoader color={"#FFF"} />;
+
+  const content = <NewProductForm users={users} />;
+
+  return content;
+};
 export default NewProduct;
