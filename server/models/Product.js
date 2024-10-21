@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
-  product_name: {
+  productName: {
     type: String,
     required: true,
     trim: true,
   },
-  base_price: {
+  basePrice: {
     type: Number,
     required: true,
     min: 0,

@@ -92,7 +92,7 @@ const orderSchema = new mongoose.Schema(
 );
 
 orderSchema.plugin(AutoIncrement, {
-  inc_field: "order_id",
+  inc_field: "orderId",
   id: "orderNum",
   start_seq: 1000,
 });

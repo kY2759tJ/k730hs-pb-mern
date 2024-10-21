@@ -18,19 +18,34 @@ const getAllOrders = async (req, res) => {
   // Add username to each order before sending the response
   // See Promise.all with map() here: https://youtu.be/4lqJBBEpjRE
   // You could also do this with a for...of loop
-  //   const ordersWithUser = await Promise.all(
-  //     orders.map(async (order) => {
-  //       const user = await User.findById(order.user).lean().exec();
-  //       return {
-  //         ...order,
-  //         username: user.username,
-  //         fullname: user.fullname,
-  //         campaign_title: campaign.title,
-  //       };
-  //     })
-  //   );
+  const ordersWithUser = await Promise.all(
+    orders.map(async (order) => {
+      const user = await User.findById(order.user).lean().exec();
 
-  res.status(200).json(orders);
+      const campaign = await Campaign.findById(order.campaign).lean().exec();
+
+      // Fetch product details for each item in the order
+      const itemsWithProductNames = await Promise.all(
+        order.items.map(async (item) => {
+          const product = await Product.findById(item.product).lean().exec();
+          return {
+            ...item,
+            productName: product?.productName || "Unknown Product", // Add product name
+          };
+        })
+      );
+
+      return {
+        ...order,
+        username: user.username,
+        fullname: user.fullname,
+        campaign: campaign.title,
+        itemsWithProductNames,
+      };
+    })
+  );
+
+  res.status(200).json(ordersWithUser);
 };
 
 // Helper function to validate the customer object
@@ -121,11 +136,11 @@ const createNewOrder = async (req, res) => {
     status,
   });
 
-  const { order_id } = order;
+  const { orderId } = order;
 
   //created
   if (order) {
-    res.status(201).json({ message: `New order ${order_id} created` });
+    res.status(201).json({ message: `New order ${orderId} created` });
   } else {
     res.status(400).json({ message: `Invalid order data received` });
   }

@@ -58,6 +58,12 @@ const CampaignsList = React.memo(() => {
         render: (text) => <a href={text}>{text}</a>, // Added href for proper link
       },
       {
+        title: "User",
+        key: "user",
+        dataIndex: "user",
+        render: (text) => <p>{text}</p>,
+      },
+      {
         title: "Action",
         key: "action",
         render: (_, record) => (
@@ -94,6 +100,7 @@ const CampaignsList = React.memo(() => {
             social_media: campaign.social_media,
             post_type: campaign.post_type,
             post_url: campaign.post_url,
+            user: campaign.username,
             action: id,
           }
         );

@@ -18,3 +18,12 @@ export const PostType = {
 
 // Define valid campaign statuses
 export const CampaignStatuses = { Active: "Active", Completed: "Completed" };
+
+//Define valid order statuses
+export const OrderStatus = [
+  "Draft",
+  "Pending Payment",
+  "Processing",
+  "Cancelled",
+  "Completed",
+];

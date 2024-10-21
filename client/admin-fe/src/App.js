@@ -10,11 +10,17 @@ import EditUser from "./features/users/EditUser";
 import NewUserForm from "./features/users/NewUserForm";
 import EditCampaign from "./features/campaigns/EditCampaign";
 import NewCampaign from "./features/campaigns/NewCampaign";
+import ProductsList from "./features/products/ProductsList";
+import EditProduct from "./features/products/EditProduct";
+import NewProduct from "./features/products/NewProduct";
 import Prefetch from "./features/auth/Prefetch";
 import PersistLogin from "./features/auth/PersistLogin";
 import { ROLES } from "./config/enums";
 import RequireAuth from "./features/auth/RequireAuth";
 import useTitle from "./hooks/useTitle";
+import OrdersList from "./features/orders/OrdersList";
+import EditOrder from "./features/orders/EditOrder";
+import NewOrder from "./features/orders/NewOrder";
 
 function App() {
   useTitle("SMPost Dashboard");
@@ -77,6 +83,36 @@ function App() {
                   <Route
                     path="new"
                     element={<NewCampaign />}
+                  />
+                </Route>
+
+                <Route path="orders">
+                  <Route
+                    index
+                    element={<OrdersList />}
+                  />
+                  <Route
+                    path=":id"
+                    element={<EditOrder />}
+                  />
+                  <Route
+                    path="new"
+                    element={<NewOrder />}
+                  />
+                </Route>
+
+                <Route path="products">
+                  <Route
+                    index
+                    element={<ProductsList />}
+                  />
+                  <Route
+                    path=":id"
+                    element={<EditProduct />}
+                  />
+                  <Route
+                    path="new"
+                    element={<NewProduct />}
                   />
                 </Route>
               </Route>

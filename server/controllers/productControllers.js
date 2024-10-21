@@ -19,14 +19,14 @@ const getAllProducts = async (req, res) => {
 //@route POST /product
 //@access Private
 const createNewProduct = async (req, res) => {
-  const { product_name, base_price } = req.body;
+  const { productName, basePrice } = req.body;
 
-  if (!product_name || !base_price) {
+  if (!productName || !basePrice) {
     return res.status(400).json({ message: `All product fields are required` });
   }
 
   //Check for duplicated product title, if duplicates found, return 409 conflicts
-  const duplicate = await Product.findOne({ product_name })
+  const duplicate = await Product.findOne({ productName })
     .collation({ locale: "en", strength: 2 })
     .lean()
     .exec();
@@ -37,13 +37,13 @@ const createNewProduct = async (req, res) => {
 
   //Create and store new product
   const product = await Product.create({
-    product_name,
-    base_price,
+    productName,
+    basePrice,
   });
 
   //created
   if (product) {
-    res.status(201).json({ message: `New product - ${product_name} created` });
+    res.status(201).json({ message: `New product - ${productName} created` });
   } else {
     res.status(400).json({ message: `Invalid product data received` });
   }
@@ -53,9 +53,9 @@ const createNewProduct = async (req, res) => {
 //@route PATCH /product
 //@access Private
 const updateProduct = async (req, res) => {
-  const { id, product_name, base_price } = req.body;
+  const { id, productName, basePrice } = req.body;
 
-  if (!id || !product_name || !base_price) {
+  if (!id || !productName || !basePrice) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -67,7 +67,7 @@ const updateProduct = async (req, res) => {
   }
 
   //Check if product title duplicate
-  const duplicate = await Product.findOne({ product_name })
+  const duplicate = await Product.findOne({ productName })
     .collation({ locale: "en", strength: 2 })
     .lean()
     .exec();
@@ -77,12 +77,12 @@ const updateProduct = async (req, res) => {
     return res.status(409).json({ message: "Duplicate product title" });
   }
 
-  product.product_name = product_name;
-  product.base_price = base_price;
+  product.productName = productName;
+  product.basePrice = basePrice;
 
   const updatedProduct = await product.save();
 
-  res.json(`'${updatedProduct.product_name}' updated`);
+  res.json(`'${updatedProduct.productName}' updated`);
 };
 
 //@desc Delete product
@@ -105,11 +105,11 @@ const deleteProduct = async (req, res) => {
   }
 
   // Save user details before deleting
-  const { _id, product_name, base_price } = product;
+  const { _id, productName, basePrice } = product;
 
   const deletedResult = await product.deleteOne();
 
-  const reply = `Product ${product_name} with ID ${_id} deleted`;
+  const reply = `Product ${productName} with ID ${_id} deleted`;
 
   res.json(reply);
 };
