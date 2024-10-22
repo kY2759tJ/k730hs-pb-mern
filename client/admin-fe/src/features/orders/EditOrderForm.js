@@ -16,10 +16,8 @@ import {
   InputNumber,
   Card,
 } from "antd";
-
 //Get Order Enums
 import { OrderStatuses, CustomerPlatforms } from "../../config/enums";
-import FormItem from "antd/es/form/FormItem";
 
 // URL validation rule
 const urlValidationRule = {
@@ -41,6 +39,15 @@ const EditOrderForm = ({ order, products }) => {
   const [items, setItems] = useState(order.itemsWithProductNames);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showAddItem, setShowAddItem] = useState(false);
+
+  const commissionRate = order.salesPerson.commissionRate;
+
+  useEffect(() => {
+    if (isSuccess || isDelSuccess) {
+      form.resetFields();
+      navigate("/dash/orders");
+    }
+  }, [isSuccess, isDelSuccess, navigate, form]);
 
   const orderStatusesOptions = Object.values(OrderStatuses).map(
     (order_status_option) => ({
@@ -68,17 +75,20 @@ const EditOrderForm = ({ order, products }) => {
     return parseFloat(total.toFixed(2));
   };
 
+  // Calculate commission earned
+  const calculateCommission = (totalAmount, rate) => {
+    return parseFloat(((totalAmount * rate) / 100).toFixed(2));
+  };
+
   // Update form field when items change
   useEffect(() => {
-    form.setFieldsValue({ totalAmount: calculateTotalAmount() });
-  }, [items, form]);
+    const totalAmount = calculateTotalAmount();
+    form.setFieldsValue({ totalAmount: totalAmount });
+    const commissionAmount = calculateCommission(totalAmount, commissionRate);
+    form.setFieldsValue({ commissionAmount: commissionAmount }); // Update commission field
 
-  useEffect(() => {
-    if (isSuccess || isDelSuccess) {
-      form.resetFields();
-      navigate("/dash/orders");
-    }
-  }, [isSuccess, isDelSuccess, navigate, form]);
+    setItems(items);
+  }, [items, form, commissionRate]);
 
   // Handle item quantity change
   const handleQuantityChange = (index, quantity) => {
@@ -92,8 +102,6 @@ const EditOrderForm = ({ order, products }) => {
         : item
     );
     setItems(updatedItems);
-    const newTotalAmount = calculateTotalAmount(updatedItems); // Recalculate total amount
-    form.setFieldsValue({ totalAmount: newTotalAmount }); // Sync with form
   };
 
   // Toggle the visibility of the add item section
@@ -133,27 +141,35 @@ const EditOrderForm = ({ order, products }) => {
   };
 
   const onFinish = async (values) => {
-    const { user, status, title, social_media, post_type, post_url } = values;
-    console.log("Payload to send:", {
+    const payload = {
       id: order.id,
-      user,
-      status,
-      title,
-      social_media,
-      post_type,
-      post_url,
-    }); // Add this line for debugging
+      salesPerson: {
+        user: order.salesPerson.user, // Assuming this remains unchanged
+        campaign: order.salesPerson.campaign,
+        commissionRate: commissionRate,
+      },
+      customer: {
+        name: values.customerName,
+        email: values.customerEmail,
+        contact: values.customerContact,
+        platform: values.customerPlatform,
+        accountId: values.accountId,
+        profileUrl: values.profileUrl,
+      },
+      items: items.map((item) => ({
+        product: item.product, // Ensure you are using the correct identifier here
+        quantity: item.quantity,
+        totalPrice: item.totalPrice,
+      })),
+      totalAmount: values.totalAmount, // Ensure this function is defined and returns the correct value
+      commissionAmount: values.commissionAmount,
+      status: values.status,
+    };
+
+    console.log(payload);
 
     try {
-      await updateOrder({
-        id: order.id,
-        user,
-        status,
-        title,
-        social_media,
-        post_type,
-        post_url,
-      });
+      await updateOrder(payload);
       console.log("Updated order successfully");
     } catch (err) {
       console.error("Failed to update order:", err);
@@ -237,6 +253,8 @@ const EditOrderForm = ({ order, products }) => {
           customerEmail: order.customer.email,
           customerContact: order.customer.contact,
           customerPlatform: order.customer.platform,
+          accountId: order.customer.accountId,
+          profileUrl: order.customer.profileUrl,
           totalAmount: order.totalAmount,
           commissionAmount: order.commissionAmount,
         }}
@@ -360,6 +378,22 @@ const EditOrderForm = ({ order, products }) => {
           ></Select>
         </Form.Item>
 
+        <Form.Item
+          label="Account ID"
+          name="accountId"
+          rules={[{ required: true }]}
+        >
+          <Input placeholder="Enter customer account id" />
+        </Form.Item>
+
+        <Form.Item
+          label="Profile URL"
+          name="profileUrl"
+          rules={[{ required: true }]}
+        >
+          <Input placeholder="Enter customer's profile URL" />
+        </Form.Item>
+
         <Divider
           orientation="left"
           style={{ color: "#ffffff", borderColor: "#ffffff" }}
@@ -437,10 +471,7 @@ const EditOrderForm = ({ order, products }) => {
               name="commissionAmount"
               label="Commission Amount (RM)"
             >
-              <InputNumber
-                value={calculateTotalAmount()}
-                readOnly
-              />
+              <InputNumber readOnly />
             </Form.Item>
           </Col>
           <Col
