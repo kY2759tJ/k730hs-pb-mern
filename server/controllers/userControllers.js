@@ -61,13 +61,13 @@ const createNewUser = async (req, res) => {
 // @route PATCH /users
 // @access Private
 const updateUser = async (req, res) => {
-  const { id, fullname, username, roles, active, password } = req.body;
+  const { id, fullname, username, roles, commissionRate, active, password } =
+    req.body;
 
   // Confirm data
   if (
     !id ||
     !fullname ||
-    //!username ||
     !Array.isArray(roles) ||
     !roles.length ||
     typeof active !== "boolean"
@@ -98,6 +98,7 @@ const updateUser = async (req, res) => {
   user.fullname = fullname;
   user.roles = roles;
   user.active = active;
+  user.commissionRate = commissionRate;
 
   if (password) {
     // Hash password

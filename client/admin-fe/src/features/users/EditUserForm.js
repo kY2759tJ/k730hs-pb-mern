@@ -4,7 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { ROLES } from "../../config/enums";
-import { Form, Input, Checkbox, Select, Button, Tooltip } from "antd";
+import {
+  Form,
+  Input,
+  Checkbox,
+  Select,
+  Button,
+  Tooltip,
+  InputNumber,
+} from "antd";
 
 const NAME_REGEX = /^[a-zA-Z]+([ '-][a-zA-Z]+)*$/;
 const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/;
@@ -29,10 +37,19 @@ const EditUserForm = ({ user }) => {
   }, [isSuccess, isDelSuccess, navigate, form]);
 
   const onFinish = async (values) => {
-    const { fullname, username, password, roles, active } = values;
+    const { fullname, username, password, roles, active, commissionRate } =
+      values;
     const payload = password
-      ? { id: user.id, fullname, username, password, roles, active }
-      : { id: user.id, fullname, username, roles, active };
+      ? {
+          id: user.id,
+          fullname,
+          username,
+          password,
+          roles,
+          active,
+          commissionRate,
+        }
+      : { id: user.id, fullname, username, roles, active, commissionRate };
     await updateUser(payload);
   };
 
@@ -63,9 +80,17 @@ const EditUserForm = ({ user }) => {
           username: user.username,
           roles: user.roles,
           active: user.active,
+          commissionRate: user.commissionRate,
         }}
         style={{ maxWidth: 600 }}
       >
+        <Form.Item
+          name="active"
+          valuePropName="checked"
+        >
+          <Checkbox>Active</Checkbox>
+        </Form.Item>
+
         <Form.Item
           label="Username"
           name="username"
@@ -107,13 +132,6 @@ const EditUserForm = ({ user }) => {
         </Form.Item>
 
         <Form.Item
-          name="active"
-          valuePropName="checked"
-        >
-          <Checkbox>Active</Checkbox>
-        </Form.Item>
-
-        <Form.Item
           label="Assigned Roles"
           name="roles"
           rules={[
@@ -126,6 +144,21 @@ const EditUserForm = ({ user }) => {
             placeholder="Select roles"
             allowClear
           />
+        </Form.Item>
+
+        <Form.Item
+          label="Commission Rate"
+          name="commissionRate"
+          rules={[
+            { required: true, message: "Please enter a commission rate!" },
+            {
+              type: "number",
+              max: 100,
+              message: "Commission Rate cannot exceed 100%!",
+            },
+          ]}
+        >
+          <InputNumber style={{ maxWidth: 500 }} />
         </Form.Item>
 
         <div className="form__action-buttons">

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAddNewUserMutation } from "./usersApiSlice";
 import { useNavigate } from "react-router-dom";
 import { ROLES } from "../../config/enums";
-import { Form, Input, Button, Select } from "antd";
+import { Form, Input, Button, Select, InputNumber } from "antd";
 
 const NAME_REGEX = /^[a-zA-Z]+([ '-][a-zA-Z]+)*$/;
 const USER_REGEX = /^[A-z]{3,20}$/;
@@ -49,10 +49,11 @@ const NewUserForm = () => {
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 14 }}
         layout="horizontal"
-        style={{ maxWidth: 600 }}
+        style={{ maxWidth: 800 }}
         onFinish={onFinish}
         initialValues={{
           roles: ["Salesperson"], // Default roles
+          commissionRate: 0,
         }}
       >
         <div className="form__title-row">
@@ -104,6 +105,21 @@ const NewUserForm = () => {
             style={{ width: "100%" }}
             options={options}
           ></Select>
+        </Form.Item>
+
+        <Form.Item
+          label="Commission Rate"
+          name="commissionRate"
+          rules={[
+            { required: true, message: "Please enter a commission rate!" },
+            {
+              type: "number",
+              max: 100,
+              message: "Commission Rate cannot exceed 100%!",
+            },
+          ]}
+        >
+          <InputNumber style={{ maxWidth: 300 }} />
         </Form.Item>
 
         <div className="form__action-buttons">

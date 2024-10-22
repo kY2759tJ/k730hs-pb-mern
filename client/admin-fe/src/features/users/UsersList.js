@@ -71,6 +71,11 @@ const UsersList = React.memo(() => {
         ),
       },
       {
+        title: "Commission Rate",
+        dataIndex: "commissionRate",
+        key: "commissionRate",
+      },
+      {
         title: "Action",
         key: "action",
         render: (_, record) => (
@@ -102,6 +107,7 @@ const UsersList = React.memo(() => {
             fullname: capitalizeName(user.fullname),
             username: user.username,
             roles: user.roles,
+            commissionRate: `${user.commissionRate}%`,
             action: userId, // Used for navigation
           }
         );
