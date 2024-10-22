@@ -16,7 +16,7 @@ import {
   Card,
 } from "antd";
 import { CustomerPlatforms, OrderStatuses } from "../../config/enums";
-
+import NewProductForm from "../products/NewProductForm";
 // URL validation rule
 const urlValidationRule = {
   type: "url",
@@ -259,7 +259,7 @@ const NewOrderForm = ({ user, campaigns, products }) => {
           Salesperson Information
         </Divider>
         <Row>
-          <Col span={12}>
+          <Col span={16}>
             <Form.Item
               name="campaign"
               label="Campaign"
@@ -272,13 +272,7 @@ const NewOrderForm = ({ user, campaigns, products }) => {
               ></Select>
             </Form.Item>
           </Col>
-          <Col span={6}>
-            <p className="form__created">
-              Salesperson: <br></br>
-              {userId}
-            </p>
-          </Col>
-          <Col span={6}>
+          <Col span={8}>
             <h4>Commission Rate: </h4>
             <p>{commissionRate}%</p>
           </Col>
