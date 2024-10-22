@@ -20,9 +20,11 @@ const getAllOrders = async (req, res) => {
   // You could also do this with a for...of loop
   const ordersWithUser = await Promise.all(
     orders.map(async (order) => {
-      const user = await User.findById(order.user).lean().exec();
+      const user = await User.findById(order.salesPerson.user).lean().exec();
 
-      const campaign = await Campaign.findById(order.campaign).lean().exec();
+      const campaign = await Campaign.findById(order.salesPerson.campaign)
+        .lean()
+        .exec();
 
       // Fetch product details for each item in the order
       const itemsWithProductNames = await Promise.all(
@@ -50,6 +52,32 @@ const getAllOrders = async (req, res) => {
 };
 
 // Helper function to validate the customer object
+const isValidSalesPerson = async (salesPerson) => {
+  const { user, commissionRate, campaign } = salesPerson;
+
+  // Basic field presence checks
+  if (!user || !commissionRate || !campaign) {
+    return false;
+  }
+
+  //Find if user exist
+  const foundUser = await User.findById(user).exec();
+
+  if (!foundUser) {
+    return false;
+  }
+
+  //Find if user exist
+  const foundCampaign = await Campaign.findById(campaign).exec();
+
+  if (!foundCampaign) {
+    return false;
+  }
+
+  return true;
+};
+
+// Helper function to validate the customer object
 const isValidCustomer = (customer) => {
   const { name, email, contact, platform, accountId, profileUrl } = customer;
 
@@ -67,7 +95,7 @@ const isValidCustomer = (customer) => {
   if (!phoneRegex.test(contact)) return false;
 
   // Validate platform
-  const validPlatforms = ["facebook", "instagram", "twitter", "linkedIn"];
+  const validPlatforms = ["Facebook", "Instagram"];
   if (!validPlatforms.includes(platform)) return false;
 
   // Validate URL format
@@ -108,10 +136,22 @@ const isValidItems = async (items) => {
 //@route POST /order
 //@access Private
 const createNewOrder = async (req, res) => {
-  const { user, campaign, customer, items, totalAmount, status } = req.body;
+  const {
+    salesPerson,
+    customer,
+    items,
+    totalAmount,
+    status,
+    commissionAmount,
+  } = req.body;
 
-  if (!user || !campaign || !customer || !items || !totalAmount || !status) {
+  if (!salesPerson || !customer || !items || !totalAmount || !status) {
     return res.status(400).json({ message: `All order fields are required` });
+  }
+
+  // Validate customer object
+  if (!isValidSalesPerson(salesPerson)) {
+    return res.status(400).json({ error: "Invalid salesPerson details." });
   }
 
   // Validate customer object
@@ -129,12 +169,12 @@ const createNewOrder = async (req, res) => {
 
   //Create and store new order
   const order = await Order.create({
-    user,
-    campaign,
+    salesPerson,
     customer,
     items,
     totalAmount,
     status,
+    commissionAmount,
   });
 
   const { orderId } = order;
@@ -176,6 +216,7 @@ const updateOrder = async (req, res) => {
   order.items = items;
   order.totalAmount = totalAmount;
   order.status = status;
+  order.commissionAmount = commissionAmount;
 
   const updatedOrder = await order.save();
 

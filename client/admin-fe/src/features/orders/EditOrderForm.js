@@ -14,6 +14,7 @@ import {
   Select,
   Table,
   InputNumber,
+  Card,
 } from "antd";
 
 //Get Order Enums
@@ -237,6 +238,7 @@ const EditOrderForm = ({ order, products }) => {
           customerContact: order.customer.contact,
           customerPlatform: order.customer.platform,
           totalAmount: order.totalAmount,
+          commissionAmount: order.commissionAmount,
         }}
       >
         <div className="form__title-row">
@@ -249,28 +251,13 @@ const EditOrderForm = ({ order, products }) => {
           Order Information
         </Divider>
         <Row>
-          <Col span={8}>
+          <Col span={12}>
             <p className="form__created">
               Date Created:
               <br />
               {created}
             </p>
           </Col>
-
-          <Col span={8}>
-            <p className="form__created">
-              Campaign: <br></br> {order.campaign}
-            </p>
-          </Col>
-          <Col span={8}>
-            <p className="form__created">
-              Salesperson: <br></br>
-              {order.fullname}
-            </p>
-          </Col>
-        </Row>
-        <br></br>
-        <Row>
           <Col span={12}>
             <Form.Item
               name="status"
@@ -286,20 +273,49 @@ const EditOrderForm = ({ order, products }) => {
               ></Select>
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item
-              name="user"
-              hidden
-            >
-              <Input
-                type="hidden"
-                readOnly
-                disabled
-              />
-            </Form.Item>
+        </Row>
+        <Divider
+          orientation="left"
+          style={{ color: "#ffffff", borderColor: "#ffffff" }}
+        >
+          Salesperson Information
+        </Divider>
+        <Row>
+          <Col span={6}>
+            <p className="form__created">
+              Campaign: <br></br> {order.campaign}
+            </p>
+          </Col>
+          <Col span={6}>
+            <p className="form__created">
+              Salesperson: <br></br>
+              {order.fullname}
+            </p>
+          </Col>
+          <Col span={6}>
+            <h4>Commission Rate: </h4>
+            <p>{order.salesPerson.commissionRate}%</p>
+          </Col>
+          <Col span={6}>
+            <h4>Commission Amount: </h4>
+            <p>
+              {new Intl.NumberFormat("en-MY", {
+                style: "currency",
+                currency: "MYR",
+              }).format(order.commissionAmount)}
+            </p>
           </Col>
         </Row>
-
+        <Form.Item
+          name="user"
+          hidden
+        >
+          <Input
+            type="hidden"
+            readOnly
+            disabled
+          />
+        </Form.Item>
         <Divider
           orientation="left"
           style={{ color: "#ffffff", borderColor: "#ffffff" }}
@@ -348,7 +364,7 @@ const EditOrderForm = ({ order, products }) => {
           orientation="left"
           style={{ color: "#ffffff", borderColor: "#ffffff" }}
         >
-          Order Item Information
+          Order Items
         </Divider>
         <Table
           dataSource={items}
@@ -358,8 +374,13 @@ const EditOrderForm = ({ order, products }) => {
         />
         <Row>
           <Col
-            span={6}
-            style={{ marginTop: "1em" }}
+            span={24}
+            style={{
+              marginTop: "1em",
+              marginBottom: "1em",
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
           >
             <Button
               type="primary"
@@ -368,25 +389,12 @@ const EditOrderForm = ({ order, products }) => {
               {showAddItem ? "Hide Add Product" : "Add Product"}
             </Button>
           </Col>
-
-          <Col
-            span={12}
-            offset={6}
-            style={{ textAlign: "right", marginTop: "1em" }}
-          >
-            <Form.Item
-              name="totalAmount"
-              label="Total Amount (RM)"
-            >
-              <InputNumber
-                value={calculateTotalAmount()}
-                readOnly
-              />
-            </Form.Item>
-          </Col>
         </Row>
         {showAddItem && (
-          <div>
+          <Card
+            title="Add New Item"
+            size="small"
+          >
             <h3>Add New Item</h3>
             <Row>
               <Col flex="auto">
@@ -412,8 +420,44 @@ const EditOrderForm = ({ order, products }) => {
                 </Button>
               </Col>
             </Row>
-          </div>
+          </Card>
         )}
+        <Divider
+          orientation="left"
+          style={{ color: "#ffffff", borderColor: "#ffffff" }}
+        >
+          Order Total
+        </Divider>
+        <Row>
+          <Col
+            span={12}
+            style={{ textAlign: "right", marginTop: "1em" }}
+          >
+            <Form.Item
+              name="commissionAmount"
+              label="Commission Amount (RM)"
+            >
+              <InputNumber
+                value={calculateTotalAmount()}
+                readOnly
+              />
+            </Form.Item>
+          </Col>
+          <Col
+            span={12}
+            style={{ textAlign: "right", marginTop: "1em" }}
+          >
+            <Form.Item
+              name="totalAmount"
+              label="Total Amount (RM)"
+            >
+              <InputNumber
+                value={calculateTotalAmount()}
+                readOnly
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
         <Divider
           orientation="left"

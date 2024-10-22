@@ -79,13 +79,20 @@ const OrdersList = React.memo(() => {
         render: (text) => <p>{text}</p>, // Added href for proper link
       },
       {
+        title: "Commission Amount",
+        dataIndex: "commissionAmount",
+        key: "commissionAmount",
+        render: (text) => <p>{text}</p>, // Added href for proper link
+      },
+      {
         title: "Salesperson",
         dataIndex: "user",
         key: "user",
-        render: (_, { campaign, user }) => (
+        render: (_, { campaign, user, commissionRate }) => (
           <div>
             <p>{campaign}</p>
             <p>{user}</p>
+            <p>{commissionRate}%</p>
           </div>
         ), // Added href for proper link
       },
@@ -131,6 +138,11 @@ const OrdersList = React.memo(() => {
               currency: "MYR",
             }).format(order.totalAmount),
             user: order.username,
+            commissionRate: order.salesPerson.commissionRate,
+            commissionAmount: new Intl.NumberFormat("en-MY", {
+              style: "currency",
+              currency: "MYR",
+            }).format(order.commissionAmount),
             action: id,
           }
         );

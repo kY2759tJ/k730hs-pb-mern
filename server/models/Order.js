@@ -10,6 +10,23 @@ const OrderStatus = [
   "Completed",
 ];
 
+const salesPersonSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
+  },
+  commissionRate: {
+    type: Number,
+    required: true,
+  },
+  campaign: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "Campaign",
+  },
+});
+
 const orderItemSchema = new mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
@@ -61,15 +78,9 @@ const customerSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
+    salesPerson: {
+      type: salesPersonSchema,
       required: true,
-      ref: "User",
-    },
-    campaign: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Campaign",
     },
     customer: {
       type: customerSchema, // Embed customer schema inside order
@@ -85,6 +96,10 @@ const orderSchema = new mongoose.Schema(
       type: String,
       enum: OrderStatus,
       default: "Draft", // Default status
+      required: true,
+    },
+    commissionAmount: {
+      type: Number,
       required: true,
     },
   },

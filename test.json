@@ -1,6 +1,9 @@
 {
-  "user": "67150d5f236acba541a27f07",
-  "campaign": "67150d5f236acba541a27f07",
+  "salesPerson": {
+    "user": "67150d5f236acba541a27f07",
+    "commissionRate": 20,
+    "campaign": "67150d5f236acba541a27f07"
+  },
   "customer": {
     "name": "John Doe",
     "email": "john@example.com",
