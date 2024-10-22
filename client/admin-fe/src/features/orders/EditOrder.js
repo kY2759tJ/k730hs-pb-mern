@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import EditOrderForm from "./EditOrderForm";
 import { useGetOrdersQuery } from "./ordersApiSlice";
-//import { useGetUsersQuery } from "../users/usersApiSlice";
 import { useGetProductsQuery } from "../products/productsApiSlice";
 import useAuth from "../../hooks/useAuth";
 import PulseLoader from "react-spinners/PulseLoader";
