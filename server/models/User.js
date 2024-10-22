@@ -25,8 +25,9 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  salespersonDetails: {
-    commission_rate: Number,
+  commissionRate: {
+    type: Number,
+    default: "0",
   },
 });
 
