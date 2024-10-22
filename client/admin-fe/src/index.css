@@ -380,6 +380,10 @@ input.ant-input.ant-input-disabled.css-dev-only-do-not-override-1hpnbz2.ant-inpu
   background-color: #ffffff;
 }
 
+.ant-modal-body label {
+  color: initial !important;
+}
+
 :where(.css-dev-only-do-not-override-1hpnbz2).ant-form {
   color: white;
 }

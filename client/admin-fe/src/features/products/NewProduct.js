@@ -14,7 +14,7 @@ const NewProduct = () => {
 
   if (!users?.length) return <PulseLoader color={"#FFF"} />;
 
-  const content = <NewProductForm users={users} />;
+  const content = <NewProductForm isInModal={false} />;
 
   return content;
 };

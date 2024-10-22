@@ -13,13 +13,13 @@ const useAuth = () => {
 
     // Extracting the userId from decoded token
     userId = decoded.UserInfo.id; // MongoDB ObjectId
-    const { username, roles } = decoded.UserInfo;
+    const { username, roles, commissionRate } = decoded.UserInfo;
 
     isAdmin = roles.includes("Admin");
 
     if (isAdmin) status = "Admin";
 
-    return { userId, username, roles, status, isAdmin };
+    return { userId, username, roles, status, isAdmin, commissionRate };
   }
 
   return { userId, username: "", roles: [], isAdmin, status };

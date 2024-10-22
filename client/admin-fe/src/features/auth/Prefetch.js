@@ -1,6 +1,8 @@
 import { store } from "../../app/store";
 import { campaignsApiSlice } from "../campaigns/campaignsApiSlice";
 import { usersApiSlice } from "../users/usersApiSlice";
+import { ordersApiSlice } from "../orders/ordersApiSlice";
+import { productsApiSlice } from "../products/productsApiSlice";
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 
@@ -12,7 +14,15 @@ const Prefetch = () => {
       })
     );
     store.dispatch(
-      usersApiSlice.util.prefetch("getUsers", "", { force: true })
+      usersApiSlice.util.prefetch("getUsers", "usersList", { force: true })
+    );
+    store.dispatch(
+      ordersApiSlice.util.prefetch("getOrders", "ordersList", { force: true })
+    );
+    store.dispatch(
+      productsApiSlice.util.prefetch("getProducts", "productsList", {
+        force: true,
+      })
     );
   }, []);
 

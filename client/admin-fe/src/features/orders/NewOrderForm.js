@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAddNewOrderMutation } from "./ordersApiSlice";
-import { useSelector } from "react-redux";
-import { selectUserById } from "../users/usersApiSlice";
+import NewProductForm from "../products/NewProductForm";
 import {
   Row,
   Col,
@@ -14,16 +13,18 @@ import {
   Table,
   InputNumber,
   Card,
+  message,
+  Modal,
 } from "antd";
 import { CustomerPlatforms, OrderStatuses } from "../../config/enums";
-import NewProductForm from "../products/NewProductForm";
+
 // URL validation rule
 const urlValidationRule = {
   type: "url",
   message: "Please enter a valid URL!",
 };
 
-const NewOrderForm = ({ user, campaigns, products }) => {
+const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
   const [addNewOrder, { isLoading, isSuccess, isError, error }] =
     useAddNewOrderMutation();
 
@@ -31,11 +32,13 @@ const NewOrderForm = ({ user, campaigns, products }) => {
   const navigate = useNavigate();
 
   //User
-  const userId = user.id;
+  console.log("user ", user.id);
   const commissionRate = user.commissionRate;
 
+  const [products, setProducts] = useState(initialProducts);
   const [items, setItems] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 
   //Update the form field once userId is set
   useEffect(() => {
@@ -91,6 +94,16 @@ const NewOrderForm = ({ user, campaigns, products }) => {
     setItems(items);
   }, [items, form, commissionRate]);
 
+  // Add new product to the product list
+  const addProductToList = (newItem) => {
+    setProducts((prev) => [...prev, newItem]);
+    //setSelectedProduct(newItem); // Auto-select the new product
+    setItems((prevItems) => [...prevItems, newItem]); // Add new product to items
+    setIsProductModalOpen(false); // Close the modal
+    message.success("Product added and selected");
+    console.log("Product added and selected ", newItem);
+  };
+
   // Handle item quantity change
   const handleQuantityChange = (index, quantity) => {
     const updatedItems = items.map((item, idx) =>
@@ -138,7 +151,7 @@ const NewOrderForm = ({ user, campaigns, products }) => {
   const onFinish = async (values) => {
     const payload = {
       salesPerson: {
-        user: userId, // Assuming this remains unchanged
+        user: user.id, // Assuming this remains unchanged
         campaign: values.campaign,
         commissionRate: commissionRate,
       },
@@ -373,12 +386,27 @@ const NewOrderForm = ({ user, campaigns, products }) => {
             <Col flex="auto">
               <Form.Item label="Select Product">
                 <Select
-                  onChange={(productId) =>
-                    setSelectedProduct(products.find((p) => p.id === productId))
+                  placeholder="Select or Add Product"
+                  style={{ width: "100%" }}
+                  value={selectedProduct?.id}
+                  onChange={(id) =>
+                    setSelectedProduct(products.find((p) => p.id === id))
                   }
-                  placeholder="Select a product"
                   options={ProductOptions}
-                ></Select>
+                  dropdownRender={(menu) => (
+                    <>
+                      {menu}
+                      <Divider style={{ margin: "8px 0" }} />
+                      <Button
+                        type="link"
+                        block
+                        onClick={() => setIsProductModalOpen(true)}
+                      >
+                        + Add New Product
+                      </Button>
+                    </>
+                  )}
+                />
               </Form.Item>
             </Col>
             <Col flex="40px">
@@ -399,6 +427,18 @@ const NewOrderForm = ({ user, campaigns, products }) => {
           pagination={false}
           rowKey="product"
         />
+
+        <Modal
+          title="Add New Product"
+          open={isProductModalOpen}
+          onCancel={() => setIsProductModalOpen(false)}
+          footer={null}
+        >
+          <NewProductForm
+            onAddProduct={addProductToList}
+            isInModal={true}
+          />
+        </Modal>
 
         <Divider
           orientation="left"

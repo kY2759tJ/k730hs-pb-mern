@@ -43,7 +43,12 @@ const createNewProduct = async (req, res) => {
 
   //created
   if (product) {
-    res.status(201).json({ message: `New product - ${productName} created` });
+    res
+      .status(201)
+      .json({
+        message: `New product - ${productName} created`,
+        id: product.id,
+      });
   } else {
     res.status(400).json({ message: `Invalid product data received` });
   }

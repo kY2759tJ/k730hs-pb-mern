@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAddNewProductMutation } from "./productsApiSlice";
-import { Form, Input, Button, Select, Divider } from "antd";
-import useAuth from "../../hooks/useAuth";
+import { Form, Input, Button, Divider, message, InputNumber } from "antd";
 
-const NewProductForm = ({ users }) => {
+const NewProductForm = ({ isInModal, onAddProduct }) => {
   const [addNewProduct, { isLoading, isSuccess, isError, error }] =
     useAddNewProductMutation();
 
@@ -14,7 +13,9 @@ const NewProductForm = ({ users }) => {
   useEffect(() => {
     if (isSuccess) {
       form.resetFields();
-      navigate("/dash/products");
+      if (!isInModal) {
+        navigate("/dash/products"); // Only navigate if not in modal
+      }
     }
   }, [isSuccess, navigate, form]);
 
@@ -22,12 +23,22 @@ const NewProductForm = ({ users }) => {
     const { productName, basePrice } = values;
 
     try {
-      await addNewProduct({
+      const newProduct = await addNewProduct({
         productName,
         basePrice,
-      });
-      console.log("Product added successfully");
+      }).unwrap();
+      const newItem = {
+        product: newProduct.id,
+        quantity: 1,
+        totalPrice: basePrice,
+        productName: productName,
+      };
+      message.success("Product added successfully");
+      console.log("Product added successfully ", newProduct);
+      onAddProduct(newItem); // Pass the new product back to NewOrderForm
+      form.resetFields(); // Clear form after submission
     } catch (err) {
+      message.error("Failed to add product");
       console.error("Failed to add product:", err);
     }
   };
@@ -41,15 +52,17 @@ const NewProductForm = ({ users }) => {
 
       <Form
         form={form}
-        labelCol={{ span: 4 }}
-        wrapperCol={{ span: 14 }}
+        labelCol={{ span: 6 }}
+        wrapperCol={{ span: 18 }}
         layout="horizontal"
         style={{ maxWidth: 600 }}
         onFinish={onFinish}
       >
-        <div className="form__title-row">
-          <h2>Add New Product</h2>
-        </div>
+        {!isInModal && (
+          <div className="form__title-row">
+            <h2>Add New Product</h2>
+          </div>
+        )}
 
         <Divider />
 
@@ -64,9 +77,16 @@ const NewProductForm = ({ users }) => {
         <Form.Item
           name="basePrice"
           label="Base Price"
-          rules={[{ required: true, message: "Base price is required!" }]}
+          rules={[
+            { required: true, message: "Base price is required!" },
+            {
+              type: "number",
+              min: 0,
+              message: "Base price must be a positive number!",
+            },
+          ]}
         >
-          <Input placeholder="Base Price" />
+          <InputNumber placeholder="Base Price" />
         </Form.Item>
 
         <div className="form__action-buttons">
