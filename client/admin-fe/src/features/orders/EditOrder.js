@@ -1,7 +1,8 @@
 import { useParams } from "react-router-dom";
 import EditOrderForm from "./EditOrderForm";
 import { useGetOrdersQuery } from "./ordersApiSlice";
-import { useGetUsersQuery } from "../users/usersApiSlice";
+//import { useGetUsersQuery } from "../users/usersApiSlice";
+import { useGetProductsQuery } from "../products/productsApiSlice";
 import useAuth from "../../hooks/useAuth";
 import PulseLoader from "react-spinners/PulseLoader";
 import useTitle from "../../hooks/useTitle";
@@ -19,13 +20,13 @@ const EditOrder = () => {
     }),
   });
 
-  const { users } = useGetUsersQuery("usersList", {
+  const { products } = useGetProductsQuery("productsList", {
     selectFromResult: ({ data }) => ({
-      users: data?.ids.map((id) => data?.entities[id]),
+      products: data?.ids.map((id) => data?.entities[id]),
     }),
   });
 
-  if (!order || !users?.length) return <PulseLoader color={"#FFF"} />;
+  if (!order || !products?.length) return <PulseLoader color={"#FFF"} />;
 
   if (!isAdmin) {
     if (order.username !== username) {
@@ -36,7 +37,7 @@ const EditOrder = () => {
   const content = (
     <EditOrderForm
       order={order}
-      users={users}
+      products={products}
     />
   );
 

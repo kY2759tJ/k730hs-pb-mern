@@ -26,7 +26,7 @@ const urlValidationRule = {
   message: "Please enter a valid URL!",
 };
 
-const EditOrderForm = ({ order, users }) => {
+const EditOrderForm = ({ order, products }) => {
   const [updateOrder, { isLoading, isSuccess, isError, error }] =
     useUpdateOrderMutation();
 
@@ -38,14 +38,39 @@ const EditOrderForm = ({ order, users }) => {
   const [form] = Form.useForm(); // Create a form instance
   const navigate = useNavigate();
   const [items, setItems] = useState(order.itemsWithProductNames);
-  const [showAddItem, setShowAddItem] = useState(false); // State for showing the add item section
-  const [selectedProduct, setSelectedProduct] = useState(null); // State for selected product
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showAddItem, setShowAddItem] = useState(false);
+
+  const orderStatusesOptions = Object.values(OrderStatuses).map(
+    (order_status_option) => ({
+      value: order_status_option,
+      label: order_status_option,
+    })
+  );
+
+  const CustomerPlatformsOptions = Object.values(CustomerPlatforms).map(
+    (order_status_option) => ({
+      value: order_status_option,
+      label: order_status_option,
+    })
+  );
+
+  const ProductOptions = products.map((product) => ({
+    label: product.productName, // Displayed text in the Select dropdown
+    value: product.id, // Unique identifier for the option
+    basePrice: product.basePrice, // Additional data (if needed)
+  }));
 
   // Calculate total amount from items
-  const calculateTotalAmount = () => {
-    const total = items.reduce((total, item) => total + item.totalPrice, 0);
-    return parseFloat(total.toFixed(2)); // Changed to 1 decimal point
+  const calculateTotalAmount = (itemsList = items) => {
+    const total = itemsList.reduce((acc, item) => acc + item.totalPrice, 0);
+    return parseFloat(total.toFixed(2));
   };
+
+  // Update form field when items change
+  useEffect(() => {
+    form.setFieldsValue({ totalAmount: calculateTotalAmount() });
+  }, [items, form]);
 
   useEffect(() => {
     if (isSuccess || isDelSuccess) {
@@ -55,23 +80,19 @@ const EditOrderForm = ({ order, users }) => {
   }, [isSuccess, isDelSuccess, navigate, form]);
 
   // Handle item quantity change
-  // Handle item quantity change
   const handleQuantityChange = (index, quantity) => {
-    const newItems = items.map((item, idx) => {
-      if (idx === index) {
-        // Create a new object with updated quantity and totalPrice
-        return {
-          ...item,
-          quantity: quantity,
-          totalPrice: quantity * (item.productName ? item.productBasePrice : 0), // Example pricing logic
-        };
-      }
-      return item; // Return unchanged item
-    });
-
-    setItems(newItems);
-    // Update the form's totalAmount field
-    form.setFieldsValue({ totalAmount: calculateTotalAmount() });
+    const updatedItems = items.map((item, idx) =>
+      idx === index
+        ? {
+            ...item,
+            quantity: quantity,
+            totalPrice: (item.totalPrice / item.quantity) * quantity,
+          }
+        : item
+    );
+    setItems(updatedItems);
+    const newTotalAmount = calculateTotalAmount(updatedItems); // Recalculate total amount
+    form.setFieldsValue({ totalAmount: newTotalAmount }); // Sync with form
   };
 
   // Toggle the visibility of the add item section
@@ -81,18 +102,33 @@ const EditOrderForm = ({ order, users }) => {
 
   // Handle adding a new item
   const addItem = () => {
-    if (!selectedProduct) return; // Ensure a product is selected
+    if (!selectedProduct) return;
 
-    const totalPrice = 1 * (selectedProduct.name ? selectedProduct.price : 0);
-    const newItem = {
-      product: selectedProduct.id, // Store product ID
-      quantity: 1,
-      totalPrice: totalPrice, // Set total price based on selected product
-      productName: selectedProduct.name,
-    };
+    const existingIndex = items.findIndex(
+      (item) => item.product === selectedProduct.id
+    );
 
-    setItems([...items, newItem]);
-    setSelectedProduct(null); // Reset the selected product after adding
+    if (existingIndex !== -1) {
+      const updatedItems = [...items];
+      const existingItem = updatedItems[existingIndex];
+      updatedItems[existingIndex] = {
+        ...existingItem,
+        quantity: existingItem.quantity + 1,
+        totalPrice: (existingItem.quantity + 1) * selectedProduct.basePrice,
+      };
+      setItems(updatedItems);
+    } else {
+      const newItem = {
+        product: selectedProduct.id,
+        quantity: 1,
+        totalPrice: selectedProduct.basePrice,
+        productName: selectedProduct.productName,
+      };
+      setItems([...items, newItem]);
+    }
+
+    setSelectedProduct(null);
+    setShowAddItem(false);
   };
 
   const onFinish = async (values) => {
@@ -144,27 +180,6 @@ const EditOrderForm = ({ order, users }) => {
     second: "numeric",
   });
 
-  const orderStatusesOptions = Object.values(OrderStatuses).map(
-    (order_status_option) => ({
-      value: order_status_option,
-      label: order_status_option,
-    })
-  );
-
-  const CustomerPlatformsOptions = Object.values(CustomerPlatforms).map(
-    (order_status_option) => ({
-      value: order_status_option,
-      label: order_status_option,
-    })
-  );
-
-  // Sample product data
-  const products = [
-    { id: "6715e7bc51ec8fb709580a7d", name: "Pokeball V1.2", price: 21 },
-    { id: "6715ea1b3a51185197b334ce", name: "Pokeball V2.2", price: 42 },
-    // Add more products as needed
-  ];
-
   // Columns for the items table
   const columns = [
     {
@@ -178,7 +193,7 @@ const EditOrderForm = ({ order, users }) => {
       key: "quantity",
       render: (text, record, index) => (
         <InputNumber
-          style={{ maxWidth: "300px" }}
+          style={{ maxWidth: 300 }}
           value={text}
           min={1}
           onChange={(value) => handleQuantityChange(index, value)}
@@ -359,16 +374,15 @@ const EditOrderForm = ({ order, users }) => {
             offset={6}
             style={{ textAlign: "right", marginTop: "1em" }}
           >
-            <FormItem
+            <Form.Item
               name="totalAmount"
               label="Total Amount (RM)"
             >
               <InputNumber
-                name="totalAmount"
                 value={calculateTotalAmount()}
-                readOnly // Make it read-only
+                readOnly
               />
-            </FormItem>
+            </Form.Item>
           </Col>
         </Row>
         {showAddItem && (
@@ -376,28 +390,16 @@ const EditOrderForm = ({ order, users }) => {
             <h3>Add New Item</h3>
             <Row>
               <Col flex="auto">
-                <Form.Item
-                  label="Select Product"
-                  maxWidth="100%"
-                >
+                <Form.Item label="Select Product">
                   <Select
-                    maxWidth="100%"
                     onChange={(productId) =>
                       setSelectedProduct(
                         products.find((p) => p.id === productId)
                       )
                     }
                     placeholder="Select a product"
-                  >
-                    {products.map((product) => (
-                      <option
-                        key={product.id}
-                        value={product.id}
-                      >
-                        {product.name}
-                      </option>
-                    ))}
-                  </Select>
+                    options={ProductOptions}
+                  ></Select>
                 </Form.Item>
               </Col>
               <Col flex="40px">
