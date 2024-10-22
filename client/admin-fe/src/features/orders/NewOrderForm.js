@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAddNewOrderMutation } from "./ordersApiSlice";
 import { useSelector } from "react-redux";
 import { selectUserById } from "../users/usersApiSlice";
-import useAuth from "../../hooks/useAuth";
 import {
   Row,
   Col,
@@ -24,24 +23,19 @@ const urlValidationRule = {
   message: "Please enter a valid URL!",
 };
 
-const NewOrderForm = ({ campaigns, products }) => {
-  const { userId } = useAuth();
-
+const NewOrderForm = ({ user, campaigns, products }) => {
   const [addNewOrder, { isLoading, isSuccess, isError, error }] =
     useAddNewOrderMutation();
 
   const [form] = Form.useForm(); // Create a form instance
   const navigate = useNavigate();
 
-  const user = useSelector((state) => selectUserById(state, userId));
-
-  console.log(user);
+  //User
+  const userId = user.id;
+  const commissionRate = user.commissionRate;
 
   const [items, setItems] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [showAddItem, setShowAddItem] = useState(false);
-
-  const commissionRate = 0;
 
   //Update the form field once userId is set
   useEffect(() => {
@@ -111,11 +105,6 @@ const NewOrderForm = ({ campaigns, products }) => {
     setItems(updatedItems);
   };
 
-  // Toggle the visibility of the add item section
-  const toggleAddItem = () => {
-    setShowAddItem((prev) => !prev);
-  };
-
   // Handle adding a new item
   const addItem = () => {
     if (!selectedProduct) return;
@@ -144,14 +133,13 @@ const NewOrderForm = ({ campaigns, products }) => {
     }
 
     setSelectedProduct(null);
-    setShowAddItem(false);
   };
 
   const onFinish = async (values) => {
     const payload = {
       salesPerson: {
         user: userId, // Assuming this remains unchanged
-        campaign: "campaign",
+        campaign: values.campaign,
         commissionRate: commissionRate,
       },
       customer: {
@@ -176,9 +164,9 @@ const NewOrderForm = ({ campaigns, products }) => {
 
     try {
       await addNewOrder(payload);
-      console.log("Campaign added successfully");
+      console.log("Order added successfully");
     } catch (err) {
-      console.error("Failed to add campaign:", err);
+      console.error("Failed to add order:", err);
     }
   };
 
@@ -292,16 +280,7 @@ const NewOrderForm = ({ campaigns, products }) => {
           </Col>
           <Col span={6}>
             <h4>Commission Rate: </h4>
-            <p>commissionRate%</p>
-          </Col>
-          <Col span={6}>
-            <h4>Commission Amount: </h4>
-            <p>
-              {new Intl.NumberFormat("en-MY", {
-                style: "currency",
-                currency: "MYR",
-              }).format(0)}
-            </p>
+            <p>{commissionRate}%</p>
           </Col>
         </Row>
         <Form.Item
@@ -380,12 +359,6 @@ const NewOrderForm = ({ campaigns, products }) => {
         >
           Order Items
         </Divider>
-        <Table
-          dataSource={items}
-          columns={columns}
-          pagination={false}
-          rowKey="product"
-        />
         <Row>
           <Col
             span={24}
@@ -395,47 +368,44 @@ const NewOrderForm = ({ campaigns, products }) => {
               display: "flex",
               justifyContent: "flex-end",
             }}
-          >
-            <Button
-              type="primary"
-              onClick={toggleAddItem}
-            >
-              {showAddItem ? "Hide Add Product" : "Add Product"}
-            </Button>
-          </Col>
+          ></Col>
         </Row>
-        {showAddItem && (
-          <Card
-            title="Add New Item"
-            size="small"
-          >
-            <h3>Add New Item</h3>
-            <Row>
-              <Col flex="auto">
-                <Form.Item label="Select Product">
-                  <Select
-                    onChange={(productId) =>
-                      setSelectedProduct(
-                        products.find((p) => p.id === productId)
-                      )
-                    }
-                    placeholder="Select a product"
-                    options={ProductOptions}
-                  ></Select>
-                </Form.Item>
-              </Col>
-              <Col flex="40px">
-                <Button
-                  type="primary"
-                  onClick={addItem}
-                  disabled={!selectedProduct}
-                >
-                  Add Item
-                </Button>
-              </Col>
-            </Row>
-          </Card>
-        )}
+        <Card
+          title="Add New Item"
+          size="small"
+          style={{ marginBottom: "1em" }}
+        >
+          <Row>
+            <Col flex="auto">
+              <Form.Item label="Select Product">
+                <Select
+                  onChange={(productId) =>
+                    setSelectedProduct(products.find((p) => p.id === productId))
+                  }
+                  placeholder="Select a product"
+                  options={ProductOptions}
+                ></Select>
+              </Form.Item>
+            </Col>
+            <Col flex="40px">
+              <Button
+                type="primary"
+                onClick={addItem}
+                disabled={!selectedProduct}
+              >
+                Add Item
+              </Button>
+            </Col>
+          </Row>
+        </Card>
+
+        <Table
+          dataSource={items}
+          columns={columns}
+          pagination={false}
+          rowKey="product"
+        />
+
         <Divider
           orientation="left"
           style={{ color: "#ffffff", borderColor: "#ffffff" }}
