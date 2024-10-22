@@ -191,18 +191,18 @@ const createNewOrder = async (req, res) => {
 //@route PATCH /order
 //@access Private
 const updateOrder = async (req, res) => {
-  const { id, user, campaign, customer, items, totalAmount, status } = req.body;
+  const {
+    id,
+    salesPerson,
+    customer,
+    totalAmount,
+    items,
+    status,
+    commissionAmount,
+  } = req.body;
 
-  if (
-    !id ||
-    !user ||
-    !campaign ||
-    !customer ||
-    !items ||
-    !totalAmount ||
-    !status
-  ) {
-    return res.status(400).json({ message: "All fields are required" });
+  if (!id || !salesPerson || !customer || !items || !status) {
+    return res.status(400).json({ message: "All update fields are required" });
   }
 
   const order = await Order.findById(id).exec();

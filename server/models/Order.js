@@ -90,6 +90,7 @@ const orderSchema = new mongoose.Schema(
     totalAmount: {
       type: Number,
       required: true,
+      default: 0,
       min: 0,
     },
     status: {
@@ -101,6 +102,8 @@ const orderSchema = new mongoose.Schema(
     commissionAmount: {
       type: Number,
       required: true,
+      default: 0,
+      min: 0,
     },
   },
   { timestamps: true }
