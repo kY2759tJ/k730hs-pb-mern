@@ -15,7 +15,10 @@ import {
   Table,
   InputNumber,
   Card,
+  Space,
 } from "antd";
+import { EditOutlined } from "@ant-design/icons";
+
 //Get Order Enums
 import { OrderStatuses, CustomerPlatforms } from "../../config/enums";
 
@@ -82,6 +85,8 @@ const EditOrderForm = ({ order, products }) => {
 
   // Update form field when items change
   useEffect(() => {
+    console.log(order.itemsWithProductNames);
+
     const totalAmount = calculateTotalAmount();
     form.setFieldsValue({ totalAmount: totalAmount });
     const commissionAmount = calculateCommission(totalAmount, commissionRate);
@@ -199,6 +204,20 @@ const EditOrderForm = ({ order, products }) => {
 
   // Columns for the items table
   const columns = [
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <Button
+            type="primary"
+            shape="circle"
+            icon={<EditOutlined />}
+            onClick={() => navigate(`/dash/products/${record.product}`)}
+          />
+        </Space>
+      ),
+    },
     {
       title: "Product Name",
       dataIndex: "productName",

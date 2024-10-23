@@ -15,8 +15,10 @@ import {
   Card,
   message,
   Modal,
+  Space,
 } from "antd";
 import { CustomerPlatforms, OrderStatuses } from "../../config/enums";
+import { EditOutlined } from "@ant-design/icons";
 
 // URL validation rule
 const urlValidationRule = {
@@ -185,6 +187,20 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
 
   // Columns for the items table
   const columns = [
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <Button
+            type="primary"
+            shape="circle"
+            icon={<EditOutlined />}
+            onClick={() => navigate(`/dash/products/${record.product}`)}
+          />
+        </Space>
+      ),
+    },
     {
       title: "Product Name",
       dataIndex: "productName",
@@ -487,7 +503,7 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
               loading={isLoading}
               disabled={isLoading}
             >
-              Update Order
+              Add Order
             </Button>
           </Col>
         </Row>
