@@ -28,11 +28,101 @@
   "status": "Draft"
 }
 
+create
 {
   "salesPerson":"67150d5f236acba541a27f07",
+  "yearMonth" : "2024-10",
+  "campaigns": [
+    {
+      "campaign": "6715156a025e987ac2fc27b7",
+      "totalCommission": 0,
+      "orders": [
+        {
+          "order": "671734479300d415b3561385",
+          "commissionRate" : 20, 
+          "commissionAmount" : 2000
+        }
+      ]
+    }
+    
+  ],  
+  "totalPayout": 0,
+  "status": "Pending"
+}
+
+update
+{
+  "salesPerson":"67150d5f236acba541a27f07",
+  "yearMonth" : "2024-10",
+  "campaigns": [
+    {
+      "campaign": "6715156a025e987ac2fc27b7",
+      "totalCommission": 500,
+      "orders": [
+        { 
+          "order": "671866cce54d442bc7c85792", 
+          "commissionRate" : 20, 
+          "commissionAmount": 56.4 
+        }
+      ]
+    },
+    {
+      "campaign": "6715129f025e987ac2fc271d",
+      "totalCommission": 500,
+      "orders": [
+        { 
+          "order": "671734479300d415b3561385", 
+          "commissionRate" : 20, 
+          "commissionAmount": 28 
+        },
+        { 
+          "order": "671738a13618edcde98d9a7d", 
+          "commissionRate" : 20, 
+          "commissionAmount": 56.4 
+        },
+        { 
+          "order": "671734479300d415b3561385", 
+          "commissionRate" : 20, 
+          "commissionAmount": 56.4 
+        },
+      ]
+    },
+  ],  
+  "totalPayout": 63.0,
+  "status": "Pending"
+}
+
+{
   "order": "671734479300d415b3561385",
-  "campaign": "6715129f025e987ac2fc271d",
-  "commissionRate": 20,
-  "commissionAmount" : 12.6,
+  "commissionRate" : 20, 
+  "commissionAmount" : 2000
+}
+
+{
+  "salesPerson":"67150d5f236acba541a27f07",
+  "yearMonth" : "2024-11",
+  "campaignId": "6715156a025e987ac2fc27b7",
+  "order": 
+  {
+    "order": "671734479300d415b3561385",
+    "commissionRate" : 20, 
+    "commissionAmount" : 2000
+    },
+  "totalPayout": 0,
+  "status": "Pending"
+}
+
+1005
+{
+  "salesPerson":"67150d5f236acba541a27f07",
+  "yearMonth" : "2024-11",
+  "campaignId": "6715156a025e987ac2fc27b7",
+  "order": 
+  {
+    "order": "6718f14184e9a9f82d13ce88",
+    "commissionRate" : 20, 
+    "commissionAmount" : 2000
+    },
+  "totalPayout": 0,
   "status": "Pending"
 }

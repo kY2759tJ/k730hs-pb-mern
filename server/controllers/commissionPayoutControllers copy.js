@@ -114,7 +114,7 @@ const createNewCommissionPayout = async (req, res) => {
 
       const updatedCommissionPayout = await existingCommissionPayout.save();
       return res.status(200).json({
-        message: `createNewCommissionPayout Commission payout '${updatedCommissionPayout.id}' updated`,
+        message: `Commission payout '${updatedCommissionPayout.id}' updated`,
       });
     } else {
       //Validate array
@@ -158,81 +158,98 @@ const createNewCommissionPayout = async (req, res) => {
 //@route PATCH /commissionPayout
 //@access Private
 const updateCommissionPayout = async (req, res) => {
-  const { salesPerson, yearMonth, campaignId, order } = req.body;
+  const { salesPerson, yearMonth, order } = req.body;
 
   // Validate required fields
-  if (!salesPerson || !yearMonth || !campaignId || !order) {
-    return res.status(400).json({
-      message: "salesPerson, yearMonth, campaignId, and order are required",
-    });
+  if (!salesPerson || !yearMonth || !order) {
+    return res
+      .status(400)
+      .json({ message: "salesPerson, yearMonth, and order are required" });
   }
 
-  try {
-    // Fetch the existing commission payout
-    const existingCommissionPayout = await CommissionPayout.findOne({
-      yearMonth,
-      salesPerson,
-    })
-      .lean()
-      .exec();
+  // Find the commission payout by ID
+  const existingCommissionPayout = await CommissionPayout.findOne({
+    yearMonth,
+    salesPerson,
+  }).exec();
 
-    if (!existingCommissionPayout) {
-      return res.status(404).json({
-        message:
-          "Commission payout not found for the given salesperson and month.",
-      });
+  // Check if commission payout exists
+  if (!commissionPayout) {
+    return res.status(400).json({ message: "Commission payout not found" });
+  }
+
+  // Validate campaign object
+  if (!isValidOrder(order)) {
+    return res
+      .status(400)
+      .json({ error: "Invalid order details in campaign." });
+  }
+
+  // Update commission amount and status
+  if (commissionAmount !== undefined) {
+    commissionPayout.totalPayout = commissionAmount; // Update total payout
+  }
+  commissionPayout.status = status;
+
+  // If campaigns are provided, update them
+  if (campaigns && Array.isArray(campaigns)) {
+    // Iterate through each campaign in the provided campaigns
+    for (const campaignData of campaigns) {
+      const campaignIndex = commissionPayout.campaigns.findIndex(
+        (campaign) => campaign.campaign.toString() === campaignData.campaignId
+      );
+
+      if (campaignIndex > -1) {
+        // If the campaign exists, update its data
+        commissionPayout.campaigns[campaignIndex].totalCommission =
+          campaignData.totalCommission;
+
+        // Update orders if provided
+        if (campaignData.orders && Array.isArray(campaignData.orders)) {
+          for (const orderData of campaignData.orders) {
+            const orderIndex = commissionPayout.campaigns[
+              campaignIndex
+            ].orders.findIndex(
+              (order) => order.order.toString() === orderData.orderId
+            );
+
+            if (orderIndex > -1) {
+              // Update existing order
+              commissionPayout.campaigns[campaignIndex].orders[
+                orderIndex
+              ].commissionRate = orderData.commissionRate;
+              commissionPayout.campaigns[campaignIndex].orders[
+                orderIndex
+              ].commissionAmount = orderData.commissionAmount;
+            } else {
+              // If order doesn't exist, push the new order
+              commissionPayout.campaigns[campaignIndex].orders.push({
+                order: orderData.orderId,
+                commissionRate: orderData.commissionRate,
+                commissionAmount: orderData.commissionAmount,
+              });
+            }
+          }
+        }
+      } else {
+        // If the campaign does not exist, add it
+        commissionPayout.campaigns.push({
+          campaign: campaignData.campaignId,
+          totalCommission: campaignData.totalCommission,
+          orders: campaignData.orders.map((orderData) => ({
+            order: orderData.orderId,
+            commissionRate: orderData.commissionRate,
+            commissionAmount: orderData.commissionAmount,
+          })),
+        });
+      }
     }
-
-    const { campaigns } = existingCommissionPayout;
-
-    // Find or create campaign and update orders
-    const thisCampaign = campaigns.find(
-      (item) => item.campaign.toString() === campaignId
-    );
-    if (thisCampaign) {
-      await updateCampaignOrders(thisCampaign, order);
-    } else {
-      await addNewCampaign(campaigns, campaignId, order);
-    }
-
-    // Update the commission payout in the database
-    await CommissionPayout.updateOne(
-      { _id: existingCommissionPayout._id },
-      { campaigns }
-    );
-
-    return res.status(201).json({ message: "Updated Order" });
-  } catch (error) {
-    console.error("Error updating commission payout:", error);
-    return res.status(500).json({ message: "Server error" });
   }
-};
 
-// Helper function to update orders within a campaign
-const updateCampaignOrders = async (campaign, order) => {
-  const existingOrderIndex = campaign.orders.findIndex(
-    (o) => o.order.toString() === order.order
-  );
+  // Save the updated commission payout
+  const updatedCommissionPayout = await commissionPayout.save();
 
-  if (existingOrderIndex !== -1) {
-    // Update existing order
-    campaign.orders[existingOrderIndex] = {
-      ...campaign.orders[existingOrderIndex],
-      ...order,
-    };
-  } else {
-    // Add new order
-    campaign.orders.push(order);
-  }
-};
-
-// Helper function to add a new campaign
-const addNewCampaign = async (campaigns, campaignId, order) => {
-  campaigns.push({
-    totalCommission: 0,
-    campaign: campaignId,
-    orders: [order],
-  });
+  res.json(`'${updatedCommissionPayout.id}' updated`);
 };
 
 //@desc Delete commissionPayout
