@@ -19,7 +19,6 @@ const EditProductForm = ({ isInModal, product, onEditProduct }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(product);
     if (isSuccess || isDelSuccess) {
       if (!isInModal) {
         navigate("/dash/products");
@@ -30,7 +29,6 @@ const EditProductForm = ({ isInModal, product, onEditProduct }) => {
 
   useEffect(() => {
     if (product) {
-      console.log("editProductForm useEffect", product);
       form.setFieldsValue(product); // Prefill product data
     } else {
       console.log("no product");
@@ -39,11 +37,11 @@ const EditProductForm = ({ isInModal, product, onEditProduct }) => {
 
   const onFinish = async (values) => {
     const { productName, basePrice } = values;
-    console.log("Payload to send:", {
-      id: product.id,
-      productName,
-      basePrice,
-    }); // Add this line for debugging
+    // console.log("Payload to send:", {
+    //   id: product.id,
+    //   productName,
+    //   basePrice,
+    // }); // Add this line for debugging
 
     try {
       const editedProduct = await updateProduct({
@@ -56,7 +54,7 @@ const EditProductForm = ({ isInModal, product, onEditProduct }) => {
         basePrice: basePrice,
         productName: productName,
       };
-      console.log("Updated product successfully", editedProduct);
+      //console.log("Updated product successfully", editedProduct);
       onEditProduct(editedItem);
     } catch (err) {
       console.error("Failed to update product:", err);

@@ -20,7 +20,7 @@ import {
 } from "antd";
 import { CustomerPlatforms, OrderStatuses } from "../../config/enums";
 import { EditOutlined } from "@ant-design/icons";
-import { addProductToList } from "../../utils/productUtils";
+import { addProductToList, onEditProduct } from "../../utils/productUtils";
 
 // URL validation rule
 const urlValidationRule = {
@@ -122,41 +122,18 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
 
   // Handle edit product
   const handleEditProduct = (updatedProduct) => {
-    console.log("Product edited ", updatedProduct);
-    console.log("Product id edited ", updatedProduct.id);
-    // Update the products list with the edited product
-    const updatedProducts = products.map((product) =>
-      product.id === updatedProduct.id ? updatedProduct : product
+    onEditProduct(
+      updatedProduct,
+      products,
+      items,
+      setProducts,
+      setItems,
+      calculateTotalAmount,
+      calculateCommission,
+      commissionRate,
+      form
     );
-    setProducts(updatedProducts);
-
-    // Update the items in the order that use this product's price
-    const updatedItems = items.map((item) =>
-      item.product === updatedProduct.id
-        ? {
-            ...item,
-            productName: updatedProduct.productName,
-            basePrice: updatedProduct.basePrice,
-            totalPrice: item.quantity * updatedProduct.basePrice,
-          }
-        : item
-    );
-    setItems(updatedItems);
-
-    // Recalculate the total amount and commission
-    const newTotalAmount = calculateTotalAmount(updatedItems);
-    const newCommissionAmount = calculateCommission(
-      newTotalAmount,
-      commissionRate
-    );
-
-    // Update the form with the new totals
-    form.setFieldsValue({
-      totalAmount: newTotalAmount,
-      commissionAmount: newCommissionAmount,
-    });
-
-    setIsEditProductModalOpen(false); // Close the edit modal
+    setIsEditProductModalOpen(false); // Close modal
   };
 
   const openEditProductModal = (product) => {
