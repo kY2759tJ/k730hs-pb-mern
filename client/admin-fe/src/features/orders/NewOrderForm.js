@@ -19,6 +19,7 @@ import {
 } from "antd";
 import { CustomerPlatforms, OrderStatuses } from "../../config/enums";
 import { EditOutlined } from "@ant-design/icons";
+import { addProductToList } from "../../utils/productUtils";
 
 // URL validation rule
 const urlValidationRule = {
@@ -96,14 +97,9 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
     setItems(items);
   }, [items, form, commissionRate]);
 
-  // Add new product to the product list
-  const addProductToList = (newItem) => {
-    setProducts((prev) => [...prev, newItem]);
-    //setSelectedProduct(newItem); // Auto-select the new product
-    setItems((prevItems) => [...prevItems, newItem]); // Add new product to items
+  const handleNewProduct = (product) => {
+    addProductToList(product, setProducts, setItems);
     setIsProductModalOpen(false); // Close the modal
-    message.success("Product added and selected");
-    console.log("Product added and selected ", newItem);
   };
 
   // Handle item quantity change
@@ -451,7 +447,7 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
           footer={null}
         >
           <NewProductForm
-            onAddProduct={addProductToList}
+            onAddProduct={handleNewProduct}
             isInModal={true}
           />
         </Modal>

@@ -16,11 +16,12 @@ import {
   InputNumber,
   Card,
   Space,
+  Modal,
 } from "antd";
 import { EditOutlined } from "@ant-design/icons";
-
-//Get Order Enums
 import { OrderStatuses, CustomerPlatforms } from "../../config/enums";
+import { addProductToList } from "../../utils/productUtils";
+import NewProductForm from "../products/NewProductForm";
 
 // URL validation rule
 const urlValidationRule = {
@@ -28,7 +29,7 @@ const urlValidationRule = {
   message: "Please enter a valid URL!",
 };
 
-const EditOrderForm = ({ order, products }) => {
+const EditOrderForm = ({ order, products: initialProducts }) => {
   const [updateOrder, { isLoading, isSuccess, isError, error }] =
     useUpdateOrderMutation();
 
@@ -42,6 +43,8 @@ const EditOrderForm = ({ order, products }) => {
   const [items, setItems] = useState(order.itemsWithProductNames);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showAddItem, setShowAddItem] = useState(false);
+  const [products, setProducts] = useState(initialProducts);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 
   const commissionRate = order.salesPerson.commissionRate;
 
@@ -94,6 +97,11 @@ const EditOrderForm = ({ order, products }) => {
 
     setItems(items);
   }, [items, form, commissionRate]);
+
+  const handleNewProduct = (product) => {
+    addProductToList(product, setProducts, setItems);
+    setIsProductModalOpen(false); // Close the modal
+  };
 
   // Handle item quantity change
   const handleQuantityChange = (index, quantity) => {
@@ -425,6 +433,18 @@ const EditOrderForm = ({ order, products }) => {
           pagination={false}
           rowKey="product"
         />
+
+        <Modal
+          title="Add New Product"
+          open={isProductModalOpen}
+          onCancel={() => setIsProductModalOpen(false)}
+          footer={null}
+        >
+          <NewProductForm
+            onAddProduct={handleNewProduct}
+            isInModal={true}
+          />
+        </Modal>
         <Row>
           <Col
             span={24}
@@ -453,14 +473,27 @@ const EditOrderForm = ({ order, products }) => {
               <Col flex="auto">
                 <Form.Item label="Select Product">
                   <Select
-                    onChange={(productId) =>
-                      setSelectedProduct(
-                        products.find((p) => p.id === productId)
-                      )
+                    placeholder="Select or Add Product"
+                    style={{ width: "100%" }}
+                    value={selectedProduct?.id}
+                    onChange={(id) =>
+                      setSelectedProduct(products.find((p) => p.id === id))
                     }
-                    placeholder="Select a product"
                     options={ProductOptions}
-                  ></Select>
+                    dropdownRender={(menu) => (
+                      <>
+                        {menu}
+                        <Divider style={{ margin: "8px 0" }} />
+                        <Button
+                          type="link"
+                          block
+                          onClick={() => setIsProductModalOpen(true)}
+                        >
+                          + Add New Product
+                        </Button>
+                      </>
+                    )}
+                  />
                 </Form.Item>
               </Col>
               <Col flex="40px">
