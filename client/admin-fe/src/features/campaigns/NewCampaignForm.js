@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAddNewCampaignMutation } from "./campaignsApiSlice";
+import { useAddNewCommissionPayoutMutation } from "../commissionPayout/commissionPayoutApiSlice";
 import { Form, Input, Button, Select, Divider } from "antd";
 import useAuth from "../../hooks/useAuth";
 import {
@@ -15,11 +16,24 @@ const urlValidationRule = {
   message: "Please enter a valid URL!",
 };
 
+const getCurrentYearMonth = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(
+    date
+  );
+  return `${year}-${month}`;
+};
+
+const yearMonth = getCurrentYearMonth();
+
 const NewCampaignForm = ({ users }) => {
   const { userId } = useAuth();
 
   const [addNewCampaign, { isLoading, isSuccess, isError, error }] =
     useAddNewCampaignMutation();
+
+  const [createCommissionPayout] = useAddNewCommissionPayoutMutation(); // Create commission payout mutation
 
   const [form] = Form.useForm(); // Create a form instance
   const navigate = useNavigate();
@@ -50,15 +64,47 @@ const NewCampaignForm = ({ users }) => {
     const { user, status, title, social_media, post_type, post_url } = values;
 
     try {
-      await addNewCampaign({
+      const result = await addNewCampaign({
         user,
         status,
         title,
         social_media,
         post_type,
         post_url,
-      });
-      console.log("Campaign added successfully");
+      }).unwrap(); // Use unwrap to get the result directly
+
+      console.log("Campaign added successfully:", result);
+
+      // Extract campaign ID from result
+      const campaignId = result.id; // Adjust based on your API response structure
+
+      const campaigns = [
+        {
+          campaign: campaignId,
+          orders: [],
+        },
+      ];
+
+      const newCommissionPayout = {
+        salesPerson: user,
+        yearMonth: yearMonth,
+        campaigns: [
+          {
+            campaign: campaignId,
+            orders: [],
+          },
+        ],
+        totalPayout: 0,
+        status: "Pending",
+      };
+
+      console.log("newCommissionPayout:", newCommissionPayout);
+
+      // Create commission payout
+      const payoutResult = await createCommissionPayout(
+        newCommissionPayout
+      ).unwrap(); // Example payout
+      console.log("Commission payout created successfully:", payoutResult);
     } catch (err) {
       console.error("Failed to add campaign:", err);
     }

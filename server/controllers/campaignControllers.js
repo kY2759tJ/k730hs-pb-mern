@@ -58,9 +58,11 @@ const createNewCampaign = async (req, res) => {
     post_url,
   });
 
+  const { _id } = campaign;
+
   //created
   if (campaign) {
-    res.status(201).json({ message: `New campaign ${title} created` });
+    res.status(201).json({ message: `New campaign ${title} created`, id: _id });
   } else {
     res.status(400).json({ message: `Invalid campaign data received` });
   }

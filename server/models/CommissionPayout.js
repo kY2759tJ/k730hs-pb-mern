@@ -44,7 +44,7 @@ const commissionPayoutSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["Pending", "Paid", "Adjusted"],
-      default: "pending",
+      default: "Pending",
     },
     totalPayout: {
       type: Number,

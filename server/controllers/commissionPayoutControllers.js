@@ -81,13 +81,7 @@ const getAllCommissionPayouts = async (req, res) => {
 const createNewCommissionPayout = async (req, res) => {
   const { salesPerson, yearMonth, campaigns, status, totalPayout } = req.body;
 
-  if (
-    !salesPerson ||
-    !yearMonth ||
-    !Array.isArray(campaigns) ||
-    campaigns.length === 0 ||
-    !status
-  ) {
+  if (!salesPerson || !yearMonth || !Array.isArray(campaigns)) {
     return res
       .status(400)
       .json({ message: `All commissionPayout fields are required` });
