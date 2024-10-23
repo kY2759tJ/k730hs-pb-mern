@@ -19,13 +19,7 @@ const EditProduct = () => {
     }),
   });
 
-  const { users } = useGetUsersQuery("usersList", {
-    selectFromResult: ({ data }) => ({
-      users: data?.ids.map((id) => data?.entities[id]),
-    }),
-  });
-
-  if (!product || !users?.length) return <PulseLoader color={"#FFF"} />;
+  if (!product) return <PulseLoader color={"#FFF"} />;
 
   if (!isAdmin) {
     if (product.username !== username) {
@@ -33,12 +27,7 @@ const EditProduct = () => {
     }
   }
 
-  const content = (
-    <EditProductForm
-      product={product}
-      users={users}
-    />
-  );
+  const content = <EditProductForm product={product} />;
 
   return content;
 };

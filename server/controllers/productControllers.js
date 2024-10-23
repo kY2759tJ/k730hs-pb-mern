@@ -43,12 +43,10 @@ const createNewProduct = async (req, res) => {
 
   //created
   if (product) {
-    res
-      .status(201)
-      .json({
-        message: `New product - ${productName} created`,
-        id: product.id,
-      });
+    res.status(201).json({
+      message: `New product - ${productName} created`,
+      id: product.id,
+    });
   } else {
     res.status(400).json({ message: `Invalid product data received` });
   }
@@ -87,7 +85,10 @@ const updateProduct = async (req, res) => {
 
   const updatedProduct = await product.save();
 
-  res.json(`'${updatedProduct.productName}' updated`);
+  res.json({
+    message: `'${updatedProduct.productName}' updated`,
+    id: product.id,
+  });
 };
 
 //@desc Delete product

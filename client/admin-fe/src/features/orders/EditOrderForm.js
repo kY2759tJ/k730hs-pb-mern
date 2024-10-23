@@ -22,6 +22,7 @@ import { EditOutlined } from "@ant-design/icons";
 import { OrderStatuses, CustomerPlatforms } from "../../config/enums";
 import { addProductToList } from "../../utils/productUtils";
 import NewProductForm from "../products/NewProductForm";
+import EditProductForm from "../products/EditProductForm";
 
 // URL validation rule
 const urlValidationRule = {
@@ -45,6 +46,8 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
   const [showAddItem, setShowAddItem] = useState(false);
   const [products, setProducts] = useState(initialProducts);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isEditProductModalOpen, setIsEditProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null); // Track product being edited
 
   const commissionRate = order.salesPerson.commissionRate;
 
@@ -88,8 +91,6 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
 
   // Update form field when items change
   useEffect(() => {
-    console.log(order.itemsWithProductNames);
-
     const totalAmount = calculateTotalAmount();
     form.setFieldsValue({ totalAmount: totalAmount });
     const commissionAmount = calculateCommission(totalAmount, commissionRate);
@@ -98,9 +99,49 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
     setItems(items);
   }, [items, form, commissionRate]);
 
+  // Handle add new product
   const handleNewProduct = (product) => {
     addProductToList(product, setProducts, setItems);
     setIsProductModalOpen(false); // Close the modal
+  };
+
+  // Handle edit product
+  const handleEditProduct = (updatedProduct) => {
+    console.log("Product edited ", updatedProduct);
+    console.log("Product id edited ", updatedProduct.id);
+    // Update the products list with the edited product
+    const updatedProducts = products.map((product) =>
+      product.id === updatedProduct.id ? updatedProduct : product
+    );
+    setProducts(updatedProducts);
+
+    // Update the items in the order that use this product's price
+    const updatedItems = items.map((item) =>
+      item.product === updatedProduct.id
+        ? {
+            ...item,
+            productName: updatedProduct.productName,
+            basePrice: updatedProduct.basePrice,
+            totalPrice: item.quantity * updatedProduct.basePrice,
+          }
+        : item
+    );
+    setItems(updatedItems);
+
+    // Recalculate the total amount and commission
+    const newTotalAmount = calculateTotalAmount(updatedItems);
+    const newCommissionAmount = calculateCommission(
+      newTotalAmount,
+      commissionRate
+    );
+
+    // Update the form with the new totals
+    form.setFieldsValue({
+      totalAmount: newTotalAmount,
+      commissionAmount: newCommissionAmount,
+    });
+
+    setIsEditProductModalOpen(false); // Close the edit modal
   };
 
   // Handle item quantity change
@@ -143,6 +184,7 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
       const newItem = {
         product: selectedProduct.id,
         quantity: 1,
+        basePrice: selectedProduct.basePrice,
         totalPrice: selectedProduct.basePrice,
         productName: selectedProduct.productName,
       };
@@ -151,6 +193,11 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
 
     setSelectedProduct(null);
     setShowAddItem(false);
+  };
+
+  const openEditProductModal = (product) => {
+    setEditingProduct(product); // Set the product to edit
+    setIsEditProductModalOpen(true); // Open the edit modal
   };
 
   const onFinish = async (values) => {
@@ -221,7 +268,14 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
             type="primary"
             shape="circle"
             icon={<EditOutlined />}
-            onClick={() => navigate(`/dash/products/${record.product}`)}
+            //onClick={() => navigate(`/dash/products/${record.product}`)}
+            onClick={() =>
+              openEditProductModal({
+                id: record.product,
+                productName: record.productName,
+                basePrice: record.basePrice,
+              })
+            }
           />
         </Space>
       ),
@@ -445,6 +499,23 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
             isInModal={true}
           />
         </Modal>
+
+        <Modal
+          title="Edit Product"
+          open={isEditProductModalOpen}
+          onCancel={() => setIsEditProductModalOpen(false)}
+          footer={null}
+        >
+          {editingProduct && (
+            <EditProductForm
+              product={editingProduct}
+              isInModal={true}
+              onClose={() => setIsEditProductModalOpen(false)}
+              onEditProduct={handleEditProduct}
+            />
+          )}
+        </Modal>
+
         <Row>
           <Col
             span={24}

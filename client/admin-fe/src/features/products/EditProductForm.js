@@ -6,7 +6,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Divider, Form, Input, Button, Select } from "antd";
 
-const EditProductForm = ({ product, users }) => {
+const EditProductForm = ({ isInModal, product, onEditProduct }) => {
   const [updateProduct, { isLoading, isSuccess, isError, error }] =
     useUpdateProductMutation();
 
@@ -19,11 +19,23 @@ const EditProductForm = ({ product, users }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log(product);
     if (isSuccess || isDelSuccess) {
+      if (!isInModal) {
+        navigate("/dash/products");
+      }
       form.resetFields();
-      navigate("/dash/products");
     }
   }, [isSuccess, isDelSuccess, navigate, form]);
+
+  useEffect(() => {
+    if (product) {
+      console.log("editProductForm useEffect", product);
+      form.setFieldsValue(product); // Prefill product data
+    } else {
+      console.log("no product");
+    }
+  }, [product, form]);
 
   const onFinish = async (values) => {
     const { productName, basePrice } = values;
@@ -34,12 +46,18 @@ const EditProductForm = ({ product, users }) => {
     }); // Add this line for debugging
 
     try {
-      await updateProduct({
+      const editedProduct = await updateProduct({
         id: product.id,
         productName,
         basePrice,
-      });
-      console.log("Updated product successfully");
+      }).unwrap();
+      const editedItem = {
+        id: editedProduct.id,
+        basePrice: basePrice,
+        productName: productName,
+      };
+      console.log("Updated product successfully", editedProduct);
+      onEditProduct(editedItem);
     } catch (err) {
       console.error("Failed to update product:", err);
     }
@@ -85,9 +103,11 @@ const EditProductForm = ({ product, users }) => {
           basePrice: product.basePrice,
         }}
       >
-        <div className="form__title-row">
-          <h2>Edit Product - {product.productName}</h2>
-        </div>
+        {!isInModal && (
+          <div className="form__title-row">
+            <h2>Edit Product - {product.productName}</h2>
+          </div>
+        )}
         <Divider />
 
         <Form.Item
