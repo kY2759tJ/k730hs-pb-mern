@@ -46,6 +46,11 @@ const Welcome = () => {
       <p>
         <Link to="/dash/products/new">Add New Product</Link>
       </p>
+
+      {/* Commission Payout */}
+      <p>
+        <Link to="/dash/commissionPayout">View Commission Payouts</Link>
+      </p>
     </section>
   );
 

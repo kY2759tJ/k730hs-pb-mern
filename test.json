@@ -27,3 +27,12 @@
   "totalAmount": 63.0,
   "status": "Draft"
 }
+
+{
+  "salesPerson":"67150d5f236acba541a27f07",
+  "order": "671734479300d415b3561385",
+  "campaign": "6715129f025e987ac2fc271d",
+  "commissionRate": 20,
+  "commissionAmount" : 12.6,
+  "status": "Pending"
+}

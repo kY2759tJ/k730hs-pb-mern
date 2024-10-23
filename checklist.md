@@ -25,8 +25,8 @@
    3. [x] Add new orders form - Add new product from new order form
    4. [x] Add new orders form - Automatically add new product to order with name, quantity, baseprice
    5. [x] Add new orders form - Select product to add to order
-   6. [ ] Add new orders form - Change product name
-   7. [ ] Add new orders form - Change product quantity
+   6. [x] Add new orders form - Change product name and base price
+   7. [x] Add new orders form - Change product quantity
    8. [ ] Add new orders form - Delete product
    9. [ ] Add new orders form - commissionAmount save to salesperson
    10. [x] Edit orders
@@ -34,7 +34,7 @@
    12. [x] Edit orders form Change product quantity, totalAmmount and commissionAmount calculated accordingly
    13. [x] Edit orders form - Add new item, totalAmount and commissionAmount calculated accordingly
    14. [x] Edit orders form - If product exist, add to quantity; else, add new product
-   15. [ ] Edit orders form - products can change name
+   15. [x] Edit orders form - products can change name and base price
    16. [ ] Edit orders form - Delete product, totalAmount and commissionAmount calculated accordingly
    17. [ ] Edit new orders form - commissionAmount save to salesperson
    18. [ ] Delete orders
