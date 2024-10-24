@@ -78,32 +78,17 @@ const NewCampaignForm = ({ users }) => {
       // Extract campaign ID from result
       const campaignId = result.id; // Adjust based on your API response structure
 
-      const campaigns = [
-        {
-          campaign: campaignId,
-          orders: [],
-        },
-      ];
-
       const newCommissionPayout = {
         salesPerson: user,
         yearMonth: yearMonth,
-        campaigns: [
-          {
-            campaign: campaignId,
-            orders: [],
-          },
-        ],
-        totalPayout: 0,
-        status: "Pending",
+        campaignId,
       };
 
       console.log("newCommissionPayout:", newCommissionPayout);
+      console.log("campaignId:", campaignId);
 
       // Create commission payout
-      const payoutResult = await createCommissionPayout(
-        newCommissionPayout
-      ).unwrap(); // Example payout
+      const payoutResult = await createCommissionPayout(newCommissionPayout); // Example payout
       console.log("Commission payout created successfully:", payoutResult);
     } catch (err) {
       console.error("Failed to add campaign:", err);
