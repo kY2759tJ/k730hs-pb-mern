@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAddNewOrderMutation } from "./ordersApiSlice";
+import { useUpdateCommissionPayoutMutation } from "../commissionPayout/commissionPayoutApiSlice";
 import NewProductForm from "../products/NewProductForm";
 import EditProductForm from "../products/EditProductForm";
 import {
@@ -28,9 +29,22 @@ const urlValidationRule = {
   message: "Please enter a valid URL!",
 };
 
+const getCurrentYearMonth = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(
+    date
+  );
+  return `${year}-${month}`;
+};
+
+const yearMonth = getCurrentYearMonth();
+
 const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
   const [addNewOrder, { isLoading, isSuccess, isError, error }] =
     useAddNewOrderMutation();
+
+  const [updateCommissionPayout] = useUpdateCommissionPayoutMutation(); // Create commission payout mutation
 
   const [form] = Form.useForm(); // Create a form instance
   const navigate = useNavigate();
@@ -201,8 +215,29 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
     console.log(payload);
 
     try {
-      await addNewOrder(payload);
-      console.log("Order added successfully");
+      const result = await addNewOrder(payload).unwrap();
+      console.log("Order added successfully", result);
+
+      const newOrder = {
+        order: result.id,
+        commissionRate: commissionRate,
+        commissionAmount: values.commissionAmount,
+      };
+
+      console.log("result:", result);
+      console.log("newOrder:", newOrder);
+
+      const newCommissionPayout = {
+        salesPerson: user.id,
+        yearMonth: yearMonth,
+        campaignId: values.campaign,
+        order: newOrder,
+      };
+
+      console.log("newCommissionPayout:", newCommissionPayout);
+
+      const payoutResult = await updateCommissionPayout(newCommissionPayout); // Example payout
+      console.log("Commission payout created successfully:", payoutResult);
     } catch (err) {
       console.error("Failed to add order:", err);
     }

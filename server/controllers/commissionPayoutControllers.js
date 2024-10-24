@@ -79,13 +79,16 @@ const getAllCommissionPayouts = async (req, res) => {
 //@route POST /commissionPayout
 //@access Private
 const createNewCommissionPayout = async (req, res) => {
-  const { salesPerson, yearMonth, campaignId, status, totalPayout } = req.body;
+  const { salesPerson, yearMonth, campaignId, status, totalPayout, order } =
+    req.body;
 
   if (!salesPerson || !yearMonth || !campaignId) {
     return res
       .status(400)
       .json({ message: `All commissionPayout fields are required` });
   }
+
+  const newOrder = order || {};
 
   //Validate salespers
   const validSalesPerson = await User.findById(salesPerson);
@@ -99,8 +102,6 @@ const createNewCommissionPayout = async (req, res) => {
       yearMonth,
       salesPerson,
     }).exec();
-
-    const newOrder = {};
 
     //== Update commission payout
     if (existingCommissionPayout) {
@@ -150,51 +151,6 @@ const createNewCommissionPayout = async (req, res) => {
       message: `New commissionPayout '${commissionPayout.id}' created`,
       id: commissionPayoutId,
     });
-
-    // if (existingCommissionPayout) {
-    //   // Update the existing commission payout
-    //   existingCommissionPayout.campaigns = campaigns;
-    //   existingCommissionPayout.totalPayout = totalPayout;
-    //   existingCommissionPayout.status = status;
-
-    //   const updatedCommissionPayout = await existingCommissionPayout.save();
-    //   return res.status(200).json({
-    //     message: `createNewCommissionPayout Commission payout '${updatedCommissionPayout.id}' updated`,
-    //   });
-    // } else {
-    //   //Get all campaigns
-    //   const campaigns = await Campaign.find().lean();
-
-    //   // Handle campaign and order updates
-    //   for (const campaignInfo of campaigns) {
-    //     // Check if the campaign exists in the Campaign collection
-    //     const campaignExists = await Campaign.findById(
-    //       campaignInfo.campaign
-    //     ).exec();
-
-    //     if (!campaignExists) {
-    //       return res.status(400).json({
-    //         message: `Campaign with ID ${campaignInfo.campaignId} does not exist`,
-    //       });
-    //     }
-    //   }
-
-    //   //Create and store new commissionPayout
-    //   const commissionPayout = await CommissionPayout.create({
-    //     salesPerson,
-    //     yearMonth,
-    //     campaigns,
-    //     status,
-    //     totalPayout,
-    //   });
-
-    //   const { commissionPayoutId } = commissionPayout;
-
-    //   return res.status(201).json({
-    //     message: `New commissionPayout '${commissionPayout.id}' created`,
-    //     id: commissionPayoutId,
-    //   });
-    // }
   } catch (error) {
     console.error("Error creating/updating commission payout:", error);
     return res.status(500).json({ message: "Server error" });
@@ -208,11 +164,13 @@ const updateCommissionPayout = async (req, res) => {
   const { salesPerson, yearMonth, campaignId, order } = req.body;
 
   // Validate required fields
-  if (!salesPerson || !yearMonth || !campaignId || !order) {
+  if (!salesPerson || !yearMonth || !campaignId) {
     return res.status(400).json({
       message: "salesPerson, yearMonth, campaignId, and order are required",
     });
   }
+
+  const newOrder = order || {};
 
   try {
     // Fetch the existing commission payout
@@ -237,9 +195,9 @@ const updateCommissionPayout = async (req, res) => {
       (item) => item.campaign.toString() === campaignId
     );
     if (thisCampaign) {
-      await updateCampaignOrders(thisCampaign, order);
+      await updateCampaignOrders(thisCampaign, newOrder);
     } else {
-      await addNewCampaign(campaigns, campaignId, order);
+      await addNewCampaign(campaigns, campaignId, newOrder);
     }
 
     // Update the commission payout in the database

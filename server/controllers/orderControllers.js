@@ -177,11 +177,11 @@ const createNewOrder = async (req, res) => {
     commissionAmount,
   });
 
-  const { orderId } = order;
+  const { _id, orderId } = order;
 
   //created
   if (order) {
-    res.status(201).json({ message: `New order ${orderId} created` });
+    res.status(201).json({ message: `New order ${orderId} created`, id: _id });
   } else {
     res.status(400).json({ message: `Invalid order data received` });
   }
