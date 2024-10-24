@@ -25,6 +25,10 @@ const getAllCommissionPayouts = async (req, res) => {
           .lean()
           .exec();
 
+        const campaigns = await Campaign.findById(commissionPayout.campaigns)
+          .lean()
+          .exec();
+
         return {
           ...commissionPayout,
           username: user.username,

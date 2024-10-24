@@ -21,6 +21,7 @@ import useTitle from "./hooks/useTitle";
 import OrdersList from "./features/orders/OrdersList";
 import EditOrder from "./features/orders/EditOrder";
 import NewOrder from "./features/orders/NewOrder";
+import CommissionPayoutsList from "./features/commissionPayout/commissionPayoutsList";
 
 function App() {
   useTitle("SMPost Dashboard");
@@ -113,6 +114,13 @@ function App() {
                   <Route
                     path="new"
                     element={<NewProduct />}
+                  />
+                </Route>
+
+                <Route path="commissionPayouts">
+                  <Route
+                    index
+                    element={<CommissionPayoutsList />}
                   />
                 </Route>
               </Route>

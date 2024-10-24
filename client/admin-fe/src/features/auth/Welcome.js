@@ -49,7 +49,7 @@ const Welcome = () => {
 
       {/* Commission Payout */}
       <p>
-        <Link to="/dash/commissionPayout">View Commission Payouts</Link>
+        <Link to="/dash/commissionPayouts">View Commission Payouts</Link>
       </p>
     </section>
   );

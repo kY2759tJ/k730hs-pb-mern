@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAddNewCampaignMutation } from "./campaignsApiSlice";
-import { useAddNewCommissionPayoutMutation } from "../commissionPayout/commissionPayoutApiSlice";
+import { useAddNewCommissionPayoutMutation } from "../commissionPayout/commissionPayoutsApiSlice";
 import { Form, Input, Button, Select, Divider } from "antd";
 import useAuth from "../../hooks/useAuth";
 import {

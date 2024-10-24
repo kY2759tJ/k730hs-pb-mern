@@ -26,7 +26,7 @@ const CommissionPayoutsList = React.memo(() => {
   const columns = useMemo(
     () => [
       {
-        title: "CommissionPayout ID",
+        title: "Commission Payout ID",
         key: "status",
         dataIndex: "status",
         render: (_, { status, commissionPayoutId }) => (
@@ -39,63 +39,29 @@ const CommissionPayoutsList = React.memo(() => {
         ),
       },
       {
-        title: "CommissionPayout Items",
-        dataIndex: "items",
-        key: "items",
-        render: (items) =>
-          items.map((item) => (
-            <div key={item._id}>
-              <p>
-                {item.quantity}x {item.productName}
-              </p>
-            </div>
-          )),
-      },
-      {
-        title: "Customer",
-        dataIndex: "customer",
-        key: "customer",
-        render: (_, { customer }) => (
-          <div>
-            <p>{customer.name}</p>
-            <p>{customer.email}</p>
-            <p>{customer.contact}</p>
-            <p>
-              <a
-                href={customer.profileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View {customer.platform} Profile
-              </a>
-            </p>
-          </div>
-        ),
-      },
-      {
-        title: "Total",
-        dataIndex: "totalAmount",
-        key: "totalAmount",
-        render: (text) => <p>{text}</p>, // Added href for proper link
-      },
-      {
-        title: "Commission Amount",
-        dataIndex: "commissionAmount",
-        key: "commissionAmount",
-        render: (text) => <p>{text}</p>, // Added href for proper link
+        title: "Year Month",
+        key: "yearMonth",
+        dataIndex: "yearMonth",
+        render: (_, { yearMonth }) => <p>{yearMonth}</p>,
       },
       {
         title: "Salesperson",
-        dataIndex: "user",
-        key: "user",
-        render: (_, { campaign, user, commissionRate }) => (
-          <div>
-            <p>{campaign}</p>
-            <p>{user}</p>
-            <p>{commissionRate}%</p>
-          </div>
-        ), // Added href for proper link
+        key: "salesperson",
+        dataIndex: "salesperson",
+        render: (_, { fullname, username }) => (
+          <>
+            <p>{fullname}</p>
+            <p>{username}</p>
+          </>
+        ),
       },
+      {
+        title: "Total Payout",
+        key: "totalPayout",
+        dataIndex: "totalPayout",
+        render: (_, { totalPayout }) => <p>{totalPayout}</p>,
+      },
+
       {
         title: "Action",
         key: "action",
@@ -110,6 +76,17 @@ const CommissionPayoutsList = React.memo(() => {
               }
             />
           </Space>
+        ),
+      },
+      {
+        title: "Timestamp",
+        key: "timestamp",
+        dataIndex: "timestamp",
+        render: (_, { createdAt, updatedAt }) => (
+          <>
+            <p>Created {createdAt}</p>
+            <p>Updated {updatedAt}</p>
+          </>
         ),
       },
     ],
@@ -127,24 +104,43 @@ const CommissionPayoutsList = React.memo(() => {
     return filteredIds
       .map((id) => {
         const commissionPayout = entities[id];
+        const created = new Date(commissionPayout.createdAt).toLocaleString(
+          "en-MY",
+          {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+          }
+        );
+        const updated = new Date(commissionPayout.updatedAt).toLocaleString(
+          "en-MY",
+          {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+          }
+        );
+
         return (
           commissionPayout && {
             key: id,
             commissionPayoutId: commissionPayout.commissionPayoutId,
             status: commissionPayout.status,
-            campaign: commissionPayout.campaign,
-            customer: commissionPayout.customer,
-            items: commissionPayout.itemsWithProductNames,
-            totalAmount: new Intl.NumberFormat("en-MY", {
+            createdAt: created,
+            updatedAt: updated,
+            yearMonth: commissionPayout.yearMonth,
+            fullname: commissionPayout.fullname,
+            username: commissionPayout.username,
+            totalPayout: new Intl.NumberFormat("en-MY", {
               style: "currency",
               currency: "MYR",
-            }).format(commissionPayout.totalAmount),
-            user: commissionPayout.username,
-            commissionRate: commissionPayout.salesPerson.commissionRate,
-            commissionAmount: new Intl.NumberFormat("en-MY", {
-              style: "currency",
-              currency: "MYR",
-            }).format(commissionPayout.commissionAmount),
+            }).format(commissionPayout.totalPayout),
             action: id,
           }
         );

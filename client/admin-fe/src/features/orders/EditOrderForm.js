@@ -3,7 +3,7 @@ import {
   useUpdateOrderMutation,
   useDeleteOrderMutation,
 } from "./ordersApiSlice";
-import { useUpdateCommissionPayoutMutation } from "../commissionPayout/commissionPayoutApiSlice";
+import { useUpdateCommissionPayoutMutation } from "../commissionPayout/commissionPayoutsApiSlice";
 import { useNavigate } from "react-router-dom";
 import {
   Row,
