@@ -13,6 +13,7 @@ const CommissionPayoutsList = React.memo(() => {
   // Extract yearMonth query parameter from the URL
   const queryParams = new URLSearchParams(location.search);
   const yearMonth = queryParams.get("yearMonth");
+  const salesPerson = queryParams.get("salesPerson");
 
   const { username, isAdmin } = useAuth();
 
@@ -22,11 +23,14 @@ const CommissionPayoutsList = React.memo(() => {
     isSuccess,
     isError,
     error,
-  } = useGetCommissionPayoutsQuery(yearMonth, {
-    pollingInterval: 15000,
-    refetchOnFocus: true,
-    refetchOnMountOrArgChange: true,
-  });
+  } = useGetCommissionPayoutsQuery(
+    { yearMonth, salesPerson },
+    {
+      pollingInterval: 15000,
+      refetchOnFocus: true,
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   const navigate = useNavigate();
 

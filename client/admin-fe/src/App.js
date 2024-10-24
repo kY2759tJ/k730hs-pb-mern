@@ -122,6 +122,10 @@ function App() {
                     index
                     element={<CommissionPayoutsList />}
                   />
+                  <Route
+                    path="details"
+                    element={<CommissionPayoutsList />}
+                  />
                 </Route>
               </Route>
               {/* End Dash */}

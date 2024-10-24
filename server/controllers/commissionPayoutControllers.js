@@ -8,10 +8,11 @@ const Campaign = require("../models/Campaign");
 //@access Private
 const getAllCommissionPayouts = async (req, res) => {
   try {
-    const { yearMonth } = req.query;
+    const { yearMonth, salesPerson } = req.query;
 
     const filter = {};
     if (yearMonth) filter.yearMonth = yearMonth;
+    if (salesPerson) filter.salesPerson = salesPerson;
 
     // Get all commission payouts
     const commissionPayouts = await CommissionPayout.find(filter).lean();
@@ -34,6 +35,8 @@ const getAllCommissionPayouts = async (req, res) => {
           ...commissionPayout,
           username: user.username,
           fullname: user.fullname,
+          qyearMonth: yearMonth,
+          qsalesPerson: salesPerson,
         };
       })
     );

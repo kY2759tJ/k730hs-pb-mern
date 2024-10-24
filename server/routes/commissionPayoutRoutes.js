@@ -12,4 +12,8 @@ router
   .patch(commissionPayoutController.updateCommissionPayout)
   .delete(commissionPayoutController.deleteCommissionPayout);
 
+router
+  .route("/details")
+  .get(commissionPayoutController.getAllCommissionPayouts);
+
 module.exports = router;
