@@ -200,10 +200,12 @@ const updateCommissionPayout = async (req, res) => {
       await addNewCampaign(campaigns, campaignId, newOrder);
     }
 
+    const totalPayout = calculateTotalPayout(campaigns);
+
     // Update the commission payout in the database
     await CommissionPayout.updateOne(
       { _id: existingCommissionPayout._id },
-      { campaigns }
+      { campaigns, totalPayout }
     );
 
     return res.status(201).json({ message: "Updated Order" });
@@ -211,6 +213,14 @@ const updateCommissionPayout = async (req, res) => {
     console.error("Error updating commission payout:", error);
     return res.status(500).json({ message: "Server error" });
   }
+};
+
+// Helper function to recalculate the total commission
+const calculateTotalCommission = (orders) => {
+  return orders.reduce(
+    (total, order) => total + (order.commissionAmount || 0),
+    0
+  );
 };
 
 // Helper function to update orders within a campaign
@@ -229,6 +239,9 @@ const updateCampaignOrders = async (campaign, order) => {
     // Add new order
     campaign.orders.push(order);
   }
+
+  // Recalculate total commission for the campaign
+  campaign.totalCommission = calculateTotalCommission(campaign.orders);
 };
 
 // Helper function to add a new campaign
@@ -238,6 +251,17 @@ const addNewCampaign = async (campaigns, campaignId, order) => {
     campaign: campaignId,
     orders: [order],
   });
+};
+
+// Helper function to recalculate the total payout
+const calculateTotalPayout = (campaigns) => {
+  return campaigns.reduce((total, campaign) => {
+    const campaignTotal = campaign.orders.reduce(
+      (sum, order) => sum + (order.commissionAmount || 0),
+      0
+    );
+    return total + campaignTotal;
+  }, 0);
 };
 
 //@desc Delete commissionPayout
