@@ -3,6 +3,7 @@ import {
   useUpdateOrderMutation,
   useDeleteOrderMutation,
 } from "./ordersApiSlice";
+import { useUpdateCommissionPayoutMutation } from "../commissionPayout/commissionPayoutApiSlice";
 import { useNavigate } from "react-router-dom";
 import {
   Row,
@@ -30,9 +31,22 @@ const urlValidationRule = {
   message: "Please enter a valid URL!",
 };
 
+const getCurrentYearMonth = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(
+    date
+  );
+  return `${year}-${month}`;
+};
+
+const yearMonth = getCurrentYearMonth();
+
 const EditOrderForm = ({ order, products: initialProducts }) => {
   const [updateOrder, { isLoading, isSuccess, isError, error }] =
     useUpdateOrderMutation();
+
+  const [updateCommissionPayout] = useUpdateCommissionPayoutMutation(); // Create commission payout mutation
 
   const [
     deleteOrder,
@@ -206,8 +220,29 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
     console.log(payload);
 
     try {
-      await updateOrder(payload);
-      console.log("Updated order successfully");
+      const result = await updateOrder(payload).unwrap();
+      console.log("Updated order successfully", result);
+
+      const updatedOrder = {
+        order: order.id,
+        commissionRate: commissionRate,
+        commissionAmount: values.commissionAmount,
+      };
+
+      console.log("result:", result);
+      console.log("newOrder:", updatedOrder);
+
+      const newCommissionPayout = {
+        salesPerson: order.salesPerson.user,
+        yearMonth: yearMonth,
+        campaignId: order.salesPerson.campaign,
+        order: updatedOrder,
+      };
+
+      console.log("updateCommissionPayout:", newCommissionPayout);
+
+      const payoutResult = await updateCommissionPayout(newCommissionPayout); // Example payout
+      console.log("Commission payout created successfully:", payoutResult);
     } catch (err) {
       console.error("Failed to update order:", err);
     }
