@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useGetCommissionPayoutsQuery } from "./commissionPayoutsApiSlice";
 import { Space, Table, Tag, Button } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, EyeOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import PulseLoader from "react-spinners/PulseLoader";
@@ -74,22 +74,6 @@ const CommissionPayoutsList = React.memo(() => {
       },
 
       {
-        title: "Action",
-        key: "action",
-        render: (_, record) => (
-          <Space size="middle">
-            <Button
-              type="primary"
-              shape="circle"
-              icon={<EditOutlined />}
-              onClick={() =>
-                navigate(`/dash/commissionPayouts/${record.action}`)
-              }
-            />
-          </Space>
-        ),
-      },
-      {
         title: "Timestamp",
         key: "timestamp",
         dataIndex: "timestamp",
@@ -98,6 +82,24 @@ const CommissionPayoutsList = React.memo(() => {
             <p>Created {createdAt}</p>
             <p>Updated {updatedAt}</p>
           </>
+        ),
+      },
+      {
+        title: "Action",
+        key: "action",
+        render: (_, { yearMonth, salesPerson }) => (
+          <Space size="middle">
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<EyeOutlined />}
+              onClick={() =>
+                navigate(
+                  `/dash/commissionPayouts/details?yearMonth=${yearMonth}&salesPerson=${salesPerson}`
+                )
+              }
+            />
+          </Space>
         ),
       },
     ],
@@ -148,6 +150,7 @@ const CommissionPayoutsList = React.memo(() => {
             yearMonth: commissionPayout.yearMonth,
             fullname: commissionPayout.fullname,
             username: commissionPayout.username,
+            salesPerson: commissionPayout.salesPerson,
             totalPayout: new Intl.NumberFormat("en-MY", {
               style: "currency",
               currency: "MYR",

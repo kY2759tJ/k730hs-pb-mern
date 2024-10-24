@@ -42,6 +42,40 @@ export const commissionPayoutsApiSlice = apiSlice.injectEndpoints({
         } else return [{ type: "CommissionPayout", id: "LIST" }];
       },
     }),
+    getCommissionPayoutsCampaigns: builder.query({
+      query: ({ yearMonth, salesPerson }) => {
+        // Construct the URL conditionally based on the values of yearMonth and salesPerson
+        let url = "/commissionPayouts"; // Default URL
+
+        if (yearMonth && salesPerson) {
+          url = `commissionPayouts/details/?yearMonth=${yearMonth}&salesPerson=${salesPerson}`;
+        } else if (yearMonth && !salesPerson) {
+          url = `/commissionPayouts?yearMonth=${yearMonth}`;
+        }
+
+        return { url };
+      },
+      validateStatus: (response, result) => {
+        return response.status === 200 && !result.isError;
+      },
+      transformResponse: (responseData) => {
+        const loadedCommissionPayouts = responseData.map((commissionPayout) => {
+          return commissionPayout;
+        });
+        return commissionPayoutsAdapter.setAll(
+          initialState,
+          loadedCommissionPayouts
+        );
+      },
+      providesTags: (result, error, arg) => {
+        if (result?.ids) {
+          return [
+            { type: "CommissionPayout", id: "LIST" },
+            ...result.ids.map((id) => ({ type: "CommissionPayout", id })),
+          ];
+        } else return [{ type: "CommissionPayout", id: "LIST" }];
+      },
+    }),
     addNewCommissionPayout: builder.mutation({
       query: (initialCommissionPayout) => ({
         url: "/commissionPayouts",
@@ -82,6 +116,7 @@ export const {
   useAddNewCommissionPayoutMutation,
   useUpdateCommissionPayoutMutation,
   useDeleteCommissionPayoutMutation,
+  useGetCommissionPayoutsCampaignsQuery,
 } = commissionPayoutsApiSlice;
 
 // returns the query result object

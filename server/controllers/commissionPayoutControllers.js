@@ -35,19 +35,93 @@ const getAllCommissionPayouts = async (req, res) => {
           ...commissionPayout,
           username: user.username,
           fullname: user.fullname,
-          qyearMonth: yearMonth,
-          qsalesPerson: salesPerson,
         };
       })
     );
-
-    console.log(commissionPayoutWithInfo);
 
     return res.status(200).json(commissionPayoutWithInfo);
   } catch (error) {
     console.error("Error fetching commission payouts:", error);
     res.status(500).json({ message: "Server error" });
   }
+};
+
+//@desc Get all commissionPayout
+//@route Get /commissionPayout
+//@access Private
+const getAllCommissionPayoutsCampaigns = async (req, res) => {
+  try {
+    const { yearMonth, salesPerson } = req.query;
+
+    const filter = {};
+    if (yearMonth) filter.yearMonth = yearMonth;
+    if (salesPerson) filter.salesPerson = salesPerson;
+
+    // Get all commission payouts
+    const commissionPayouts = await CommissionPayout.find(filter).lean();
+
+    // If no commission payouts found
+    if (!commissionPayouts.length) {
+      return res.status(400).json({ message: "No commission payouts found" });
+    }
+
+    // Add username to each order before sending the response
+    // See Promise.all with map() here: https://youtu.be/4lqJBBEpjRE
+    // You could also do this with a for...of loop
+    const commissionPayoutWithInfo = await Promise.all(
+      commissionPayouts.map(async (commissionPayout) => {
+        const user = await User.findById(commissionPayout.salesPerson)
+          .lean()
+          .exec();
+
+        return {
+          ...commissionPayout,
+          username: user.username,
+          fullname: user.fullname,
+          qyearMonth: yearMonth,
+          qsalesPerson: salesPerson,
+        };
+      })
+    );
+
+    // Fetch campaign titles based on campaign IDs
+    const campaignIds = commissionPayoutWithInfo.flatMap((payout) =>
+      payout.campaigns.map((c) => c.campaign)
+    );
+
+    const campaignTitles = await getCampaignTitles(campaignIds);
+
+    // Extracting campaign data
+    const campaignData = commissionPayoutWithInfo
+      .map((payout) => {
+        return payout.campaigns.map((campaign) => ({
+          id: campaign.campaign,
+          campaignId: campaign.campaign,
+          campaignTitle: campaignTitles[campaign.campaign], // Access title from the mapping
+          totalCommission: campaign.totalCommission,
+          username: payout.username,
+        }));
+      })
+      .flat(); // Flattening the array if needed
+
+    console.log(campaignData);
+
+    return res.status(200).json(campaignData);
+  } catch (error) {
+    console.error("Error fetching commission payouts:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Function to get campaign titles from the Campaign model
+const getCampaignTitles = async (campaignIds) => {
+  const campaigns = await Campaign.find({ _id: { $in: campaignIds } }).lean();
+
+  // Create a mapping of campaignId to title
+  return campaigns.reduce((acc, campaign) => {
+    acc[campaign._id] = campaign.title; // Assuming each campaign has a title field
+    return acc;
+  }, {});
 };
 
 //@desc Create new commissionPayout
@@ -273,4 +347,5 @@ module.exports = {
   createNewCommissionPayout,
   updateCommissionPayout,
   deleteCommissionPayout,
+  getAllCommissionPayoutsCampaigns,
 };

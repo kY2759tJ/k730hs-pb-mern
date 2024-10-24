@@ -22,6 +22,7 @@ import OrdersList from "./features/orders/OrdersList";
 import EditOrder from "./features/orders/EditOrder";
 import NewOrder from "./features/orders/NewOrder";
 import CommissionPayoutsList from "./features/commissionPayout/commissionPayoutsList";
+import CommissionPayoutsCampaignsList from "./features/commissionPayout/CommissionPayoutsCampaignsList";
 
 function App() {
   useTitle("SMPost Dashboard");
@@ -124,7 +125,8 @@ function App() {
                   />
                   <Route
                     path="details"
-                    element={<CommissionPayoutsList />}
+                    //element={<CommissionPayoutsList />}
+                    element={<CommissionPayoutsCampaignsList />}
                   />
                 </Route>
               </Route>

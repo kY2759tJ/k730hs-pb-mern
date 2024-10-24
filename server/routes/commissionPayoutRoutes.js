@@ -14,6 +14,6 @@ router
 
 router
   .route("/details")
-  .get(commissionPayoutController.getAllCommissionPayouts);
+  .get(commissionPayoutController.getAllCommissionPayoutsCampaigns);
 
 module.exports = router;
