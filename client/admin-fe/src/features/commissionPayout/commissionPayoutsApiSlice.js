@@ -8,12 +8,16 @@ const initialState = commissionPayoutsAdapter.getInitialState();
 export const commissionPayoutsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getCommissionPayouts: builder.query({
-      query: () => ({
-        url: "/commissionPayouts",
-        validateStatus: (response, result) => {
-          return response.status === 200 && !result.isError;
-        },
-      }),
+      query: (yearMonth) => {
+        // Construct the URL conditionally based on the yearMonth value
+        const url = yearMonth
+          ? `/commissionPayouts?yearMonth=${yearMonth}`
+          : "/commissionPayouts";
+        return { url };
+      },
+      validateStatus: (response, result) => {
+        return response.status === 200 && !result.isError;
+      },
       transformResponse: (responseData) => {
         const loadedCommissionPayouts = responseData.map((commissionPayout) => {
           commissionPayout.id = commissionPayout._id;

@@ -8,8 +8,13 @@ const Campaign = require("../models/Campaign");
 //@access Private
 const getAllCommissionPayouts = async (req, res) => {
   try {
+    const { yearMonth } = req.query;
+
+    const filter = {};
+    if (yearMonth) filter.yearMonth = yearMonth;
+
     // Get all commission payouts
-    const commissionPayouts = await CommissionPayout.find().lean();
+    const commissionPayouts = await CommissionPayout.find(filter).lean();
 
     // If no commission payouts found
     if (!commissionPayouts.length) {
@@ -33,7 +38,9 @@ const getAllCommissionPayouts = async (req, res) => {
       })
     );
 
-    res.status(200).json(commissionPayoutWithInfo);
+    console.log(commissionPayoutWithInfo);
+
+    return res.status(200).json(commissionPayoutWithInfo);
   } catch (error) {
     console.error("Error fetching commission payouts:", error);
     res.status(500).json({ message: "Server error" });

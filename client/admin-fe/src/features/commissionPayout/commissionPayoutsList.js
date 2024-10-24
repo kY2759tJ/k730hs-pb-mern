@@ -5,8 +5,15 @@ import { EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import PulseLoader from "react-spinners/PulseLoader";
+import { useLocation } from "react-router-dom";
 
 const CommissionPayoutsList = React.memo(() => {
+  const location = useLocation();
+
+  // Extract yearMonth query parameter from the URL
+  const queryParams = new URLSearchParams(location.search);
+  const yearMonth = queryParams.get("yearMonth");
+
   const { username, isAdmin } = useAuth();
 
   const {
@@ -15,7 +22,7 @@ const CommissionPayoutsList = React.memo(() => {
     isSuccess,
     isError,
     error,
-  } = useGetCommissionPayoutsQuery("commissionPayoutsList", {
+  } = useGetCommissionPayoutsQuery(yearMonth, {
     pollingInterval: 15000,
     refetchOnFocus: true,
     refetchOnMountOrArgChange: true,
