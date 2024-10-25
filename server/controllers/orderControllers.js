@@ -8,7 +8,7 @@ const Campaign = require("../models/Campaign");
 //@access Private
 const getAllOrders = async (req, res) => {
   //Get all orders
-  const orders = await Order.find().lean();
+  const orders = await Order.find().lean().sort({ createdAt: -1 });
 
   //If no orders
   if (!orders?.length) {
