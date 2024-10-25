@@ -4,8 +4,8 @@ import {
   useDeleteCampaignMutation,
 } from "./campaignsApiSlice";
 import { useNavigate } from "react-router-dom";
-import { Row, Col, Divider, Form, Input, Button, Select } from "antd";
-
+import { Row, Col, Divider, Form, Input, Button, Select, message } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 //Get Campaign Enums
 import {
   SocialMediaType,
@@ -68,6 +68,16 @@ const EditCampaignForm = ({ campaign, users }) => {
 
   const onDeleteCampaign = async () => {
     await deleteCampaign({ id: campaign.id });
+
+    const deleteCommissionPayout = {
+      salesPerson: campaign.user,
+      //yearMonth: yearMonth,
+      campaignId: campaign.id,
+    };
+
+    message.success(
+      "Campaign deleted and commission recalculated successfully"
+    );
   };
 
   const created = new Date(campaign.createdAt).toLocaleString("en-MY", {
@@ -234,7 +244,22 @@ const EditCampaignForm = ({ campaign, users }) => {
               loading={isLoading}
               disabled={isLoading}
             >
-              Update Campaign
+              Update
+            </Button>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Button
+              type="primary"
+              danger
+              title="Save"
+              icon={<DeleteOutlined />}
+              loading={isLoading}
+              disabled={isLoading}
+              onClick={onDeleteCampaign}
+            >
+              Delete
             </Button>
           </Col>
         </Row>

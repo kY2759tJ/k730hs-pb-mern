@@ -1,5 +1,6 @@
 const Campaign = require("../models/Campaign");
 const User = require("../models/User");
+const CommissionPayout = "../models/CommissionPayout";
 
 //@desc Get all campaign
 //@route Get /campaign
@@ -113,27 +114,59 @@ const updateCampaign = async (req, res) => {
 const deleteCampaign = async (req, res) => {
   const { id } = req.body;
 
-  if (!id) {
-    return res.status(400).json({ message: `Campaign ID required` });
+  try {
+    // Step 1: Find all orders associated with the campaign
+    const payouts = await CommissionPayout.find({
+      "campaigns.campaign": id,
+    });
+
+    const orderIds = payouts.flatMap((payout) =>
+      payout.campaigns
+        .filter((campaign) => campaign.campaign.toString() === id)
+        .flatMap((campaign) => campaign.orders.map((order) => order.order))
+    );
+
+    console.log("Orders to be deleted:", orderIds);
+
+    // Step 2: Delete the campaign from CommissionPayout documents
+    const campaignDeleteResult = await CommissionPayout.updateMany(
+      {}, // Match all documents
+      { $pull: { campaigns: { campaign: id } } }
+    );
+
+    // Step 3: Recalculate the total payout for updated documents
+    const updatedPayouts = await CommissionPayout.find(); // Fetch updated documents
+
+    for (const payout of updatedPayouts) {
+      payout.totalPayout = payout.campaigns.reduce(
+        (total, campaign) => total + (campaign.totalCommission || 0),
+        0
+      );
+      await payout.save(); // Save the updated totalPayout
+    }
+
+    // Step 4: Delete associated orders from Order schema
+    const orderDeleteResult = await Order.deleteMany({
+      _id: { $in: orderIds },
+    });
+
+    // Step 5: Delete the campaign from the Campaign schema
+    const campaignSchemaDeleteResult = await Campaign.deleteOne({
+      _id: id,
+    });
+
+    return {
+      message: `Campaign and associated data deleted successfully.`,
+      deletedCampaigns: campaignDeleteResult.modifiedCount,
+      deletedOrders: orderDeleteResult.deletedCount,
+      deletedCampaignSchema: campaignSchemaDeleteResult.deletedCount,
+    };
+  } catch (error) {
+    console.error("Error deleting campaign and recalculating payout:", error);
+    throw new Error(
+      "Server error while deleting campaign and recalculating payout."
+    );
   }
-
-  //to-do: delete commision
-
-  //Check if campaign exist to delete
-  const campaign = await Campaign.findById(id).exec();
-
-  if (!campaign) {
-    return res.status(400).json({ message: "Campaign not found" });
-  }
-
-  // Save user details before deleting
-  const { _id, title, social_media, post_type, post_url } = campaign;
-
-  const deletedResult = await campaign.deleteOne();
-
-  const reply = `Campaign ${title} with ID ${_id} deleted`;
-
-  res.json(reply);
 };
 
 module.exports = {
