@@ -100,6 +100,7 @@ const getAllCommissionPayoutsCampaigns = async (req, res) => {
           campaignTitle: campaignTitles[campaign.campaign], // Access title from the mapping
           totalCommission: campaign.totalCommission,
           username: payout.username,
+          orderCount: campaign.orders.length,
         }));
       })
       .flat(); // Flattening the array if needed

@@ -46,7 +46,16 @@ const CommissionPayoutsCampaignsList = React.memo(() => {
           </div>
         ),
       },
-
+      {
+        title: "Order Count",
+        key: "orderCount",
+        dataIndex: "orderCount",
+        render: (_, { orderCount }) => (
+          <>
+            <p>{orderCount}</p>
+          </>
+        ),
+      },
       {
         title: "Total Commission",
         key: "totalCommission",
@@ -78,11 +87,11 @@ const CommissionPayoutsCampaignsList = React.memo(() => {
             key: id,
             campaignId: commissionPayout.campaignId,
             campaignTitle: commissionPayout.campaignTitle,
-
             totalCommission: new Intl.NumberFormat("en-MY", {
               style: "currency",
               currency: "MYR",
             }).format(commissionPayout.totalCommission),
+            orderCount: commissionPayout.orderCount,
             action: id,
           }
         );
