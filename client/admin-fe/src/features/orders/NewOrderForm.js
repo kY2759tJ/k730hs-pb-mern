@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAddNewOrderMutation } from "./ordersApiSlice";
 import { useUpdateCommissionPayoutMutation } from "../commissionPayout/commissionPayoutsApiSlice";
 import NewProductForm from "../products/NewProductForm";
@@ -41,6 +41,11 @@ const getCurrentYearMonth = () => {
 const yearMonth = getCurrentYearMonth();
 
 const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
+  const location = useLocation(); // Retrieve state from the previous page
+  const campaign = location.state?.campaign; // Extract campaign data (if passed)
+
+  const [isCampaignPrefilled, setIsCampaignPrefilled] = useState(false); // Track if the campaign is pre-filled
+
   const [addNewOrder, { isLoading, isSuccess, isError, error }] =
     useAddNewOrderMutation();
 
@@ -59,6 +64,13 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isEditProductModalOpen, setIsEditProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null); // Track product being edited
+
+  useEffect(() => {
+    if (campaign) {
+      form.setFieldsValue({ campaign: campaign.id }); // Pre-fill the campaign field
+      setIsCampaignPrefilled(true);
+    }
+  }, [campaign, form]);
 
   //Update the form field once userId is set
   useEffect(() => {
@@ -355,6 +367,7 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
                 placeholder="Select campaign"
                 style={{ width: "100%" }}
                 options={CampaignOptions}
+                disabled={isCampaignPrefilled}
               ></Select>
             </Form.Item>
           </Col>

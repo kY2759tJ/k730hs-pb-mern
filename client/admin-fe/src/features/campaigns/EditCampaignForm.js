@@ -4,7 +4,7 @@ import {
   useDeleteCampaignMutation,
 } from "./campaignsApiSlice";
 import { useUpdateCommissionPayoutMutation } from "../commissionPayout/commissionPayoutsApiSlice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Row, Col, Divider, Form, Input, Button, Select, message } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 //Get Campaign Enums
@@ -23,6 +23,10 @@ const urlValidationRule = {
 const EditCampaignForm = ({ campaign, users }) => {
   const [updateCampaign, { isLoading, isSuccess, isError, error }] =
     useUpdateCampaignMutation();
+
+  const handleAddNewOrder = () => {
+    navigate("/dash/orders/new", { state: { campaign } }); // Pass campaign as state
+  };
 
   const [
     deleteCampaign,
@@ -245,13 +249,21 @@ const EditCampaignForm = ({ campaign, users }) => {
               {updated}
             </p>
           </Col>
-          <Col span={12}>
+          <Col span={6}>
+            <Link to="/dash/orders/new">
+              <Button
+                type="primary"
+                onClick={handleAddNewOrder}
+              >
+                Add New Order
+              </Button>
+            </Link>
+          </Col>
+          <Col span={6}>
             <Button
               type="primary"
               title="Save"
               htmlType="submit"
-              loading={isLoading}
-              disabled={isLoading}
             >
               Update
             </Button>
