@@ -53,10 +53,10 @@ export const campaignsApiSlice = apiSlice.injectEndpoints({
       ],
     }),
     deleteCampaign: builder.mutation({
-      query: ({ id }) => ({
+      query: ({ id, salesPerson }) => ({
         url: `/campaigns`,
         method: "DELETE",
-        body: { id },
+        body: { id, salesPerson },
       }),
       invalidatesTags: (result, error, arg) => [
         { type: "Campaign", id: arg.id },

@@ -1,6 +1,7 @@
 const Campaign = require("../models/Campaign");
 const User = require("../models/User");
-const CommissionPayout = "../models/CommissionPayout";
+const Order = require("../models/Order");
+const CommissionPayout = require("../models/CommissionPayout");
 
 //@desc Get all campaign
 //@route Get /campaign
@@ -112,61 +113,87 @@ const updateCampaign = async (req, res) => {
 //@route DELETE /campaign
 //@access Private
 const deleteCampaign = async (req, res) => {
-  const { id } = req.body;
+  const { id, salesPerson } = req.body;
 
   try {
+    const filter = {};
+
     // Step 1: Find all orders associated with the campaign
-    const payouts = await CommissionPayout.find({
+    const existingCommissionPayouts = await CommissionPayout.find({
+      salesPerson,
       "campaigns.campaign": id,
-    });
+    }).exec();
 
-    const orderIds = payouts.flatMap((payout) =>
-      payout.campaigns
-        .filter((campaign) => campaign.campaign.toString() === id)
-        .flatMap((campaign) => campaign.orders.map((order) => order.order))
+    const { campaigns } = existingCommissionPayouts;
+
+    const commissionPayouts = await Promise.all(
+      existingCommissionPayouts.map(async (commissionPayout) => {
+        const thisCampaign = commissionPayout.campaigns.filter(
+          (campaign) => campaign.campaign.toString() === id
+        );
+
+        //Find orderIds and delete from Order
+        const orderIds = thisCampaign.flatMap(
+          (campaign) => campaign.orders.map((order) => order.order) // Get only the order IDs
+        );
+
+        const orderDeleteResult = await Order.deleteMany({
+          _id: { $in: orderIds },
+        });
+
+        // Step 2: Delete the campaign from CommissionPayout documents and recalcualte
+        const campaignDeleteResult = await CommissionPayout.updateMany(
+          { salesPerson }, // Match all documents
+          { $pull: { campaigns: { campaign: id } } }
+        );
+
+        const updatedPayouts = await CommissionPayout.find(); // Fetch updated documents
+
+        for (const payout of updatedPayouts) {
+          payout.totalPayout = payout.campaigns.reduce(
+            (total, campaign) => total + (campaign.totalCommission || 0),
+            0
+          );
+          await payout.save(); // Save the updated totalPayout
+        }
+
+        // Step 5: Delete the campaign from the Campaign schema
+        const campaignSchemaDeleteResult = await Campaign.deleteOne({
+          _id: id,
+        });
+
+        return {
+          yearMonth: commissionPayout.yearMonth,
+          thisCampaigns: thisCampaign,
+          thisOrders: orderIds,
+          updatedPayouts: updatedPayouts,
+        };
+      })
     );
 
-    console.log("Orders to be deleted:", orderIds);
-
-    // Step 2: Delete the campaign from CommissionPayout documents
-    const campaignDeleteResult = await CommissionPayout.updateMany(
-      {}, // Match all documents
-      { $pull: { campaigns: { campaign: id } } }
-    );
-
-    // Step 3: Recalculate the total payout for updated documents
-    const updatedPayouts = await CommissionPayout.find(); // Fetch updated documents
-
-    for (const payout of updatedPayouts) {
-      payout.totalPayout = payout.campaigns.reduce(
-        (total, campaign) => total + (campaign.totalCommission || 0),
-        0
-      );
-      await payout.save(); // Save the updated totalPayout
-    }
-
-    // Step 4: Delete associated orders from Order schema
-    const orderDeleteResult = await Order.deleteMany({
-      _id: { $in: orderIds },
-    });
-
-    // Step 5: Delete the campaign from the Campaign schema
-    const campaignSchemaDeleteResult = await Campaign.deleteOne({
-      _id: id,
-    });
-
-    return {
+    return res.json({
       message: `Campaign and associated data deleted successfully.`,
-      deletedCampaigns: campaignDeleteResult.modifiedCount,
-      deletedOrders: orderDeleteResult.deletedCount,
-      deletedCampaignSchema: campaignSchemaDeleteResult.deletedCount,
-    };
+      commissionPayouts: commissionPayouts,
+      existingCommissionPayouts: existingCommissionPayouts,
+      //campaignDeleteResult: campaignDeleteResult,
+    });
   } catch (error) {
     console.error("Error deleting campaign and recalculating payout:", error);
     throw new Error(
       "Server error while deleting campaign and recalculating payout."
     );
   }
+};
+
+// Helper function to recalculate the total payout
+const calculateTotalPayout = (campaigns) => {
+  return campaigns.reduce((total, campaign) => {
+    const campaignTotal = campaign.orders.reduce(
+      (sum, order) => sum + (order.commissionAmount || 0),
+      0
+    );
+    return total + campaignTotal;
+  }, 0);
 };
 
 module.exports = {

@@ -3,6 +3,7 @@ import {
   useUpdateCampaignMutation,
   useDeleteCampaignMutation,
 } from "./campaignsApiSlice";
+import { useUpdateCommissionPayoutMutation } from "../commissionPayout/commissionPayoutsApiSlice";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Divider, Form, Input, Button, Select, message } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
@@ -27,6 +28,8 @@ const EditCampaignForm = ({ campaign, users }) => {
     deleteCampaign,
     { isSuccess: isDelSuccess, isError: isDelError, error: delerror },
   ] = useDeleteCampaignMutation();
+
+  const [updateCommissionPayout] = useUpdateCommissionPayoutMutation(); // Create commission payout mutation
 
   const [form] = Form.useForm(); // Create a form instance
   const navigate = useNavigate();
@@ -67,13 +70,19 @@ const EditCampaignForm = ({ campaign, users }) => {
   };
 
   const onDeleteCampaign = async () => {
-    await deleteCampaign({ id: campaign.id });
+    await deleteCampaign({ id: campaign.id, salesPerson: campaign.user });
 
-    const deleteCommissionPayout = {
+    const deleteFromCommissionPayout = {
       salesPerson: campaign.user,
-      //yearMonth: yearMonth,
       campaignId: campaign.id,
+      action: "deleteCampaigns",
     };
+
+    console.log("deleteFromCommissionPayout ", deleteFromCommissionPayout);
+
+    // const payoutResult = await updateCommissionPayout(
+    //   deleteFromCommissionPayout
+    // );
 
     message.success(
       "Campaign deleted and commission recalculated successfully"
