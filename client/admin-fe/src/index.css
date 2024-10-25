@@ -89,7 +89,7 @@ a {
 
 a,
 a:visited {
-  color: var(--LINK-COLOR);
+  color: #3957ff;
 }
 
 a:hover,

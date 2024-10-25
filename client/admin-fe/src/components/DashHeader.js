@@ -34,6 +34,15 @@ const DashHeader = () => {
   const onCampaignsClicked = () => navigate("/dash/campaigns");
   const onUsersClicked = () => navigate("/dash/users");
 
+  const handleLogout = async () => {
+    try {
+      await sendLogout().unwrap(); // Ensure the mutation completes successfully
+      navigate("/login"); // Navigate to the login page immediately
+    } catch (err) {
+      console.error("Failed to logout:", err);
+    }
+  };
+
   let dashClass = null;
   if (
     !DASH_REGEX.test(pathname) &&
@@ -101,7 +110,7 @@ const DashHeader = () => {
     <button
       className="icon-button"
       title="Logout"
-      onClick={sendLogout}
+      onClick={handleLogout}
     >
       <FontAwesomeIcon icon={faRightFromBracket} />
     </button>
