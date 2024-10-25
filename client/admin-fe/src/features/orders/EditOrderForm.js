@@ -18,8 +18,9 @@ import {
   Card,
   Space,
   Modal,
+  message,
 } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { OrderStatuses, CustomerPlatforms } from "../../config/enums";
 import { addProductToList, onEditProduct } from "../../utils/productUtils";
 import NewProductForm from "../products/NewProductForm";
@@ -31,16 +32,28 @@ const urlValidationRule = {
   message: "Please enter a valid URL!",
 };
 
-const getCurrentYearMonth = () => {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(
-    date
-  );
-  return `${year}-${month}`;
-};
+// const getCurrentYearMonth = () => {
+//   const date = new Date();
+//   const year = date.getFullYear();
+//   const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(
+//     date
+//   );
+//   return `${year}-${month}`;
+// };
 
-const yearMonth = getCurrentYearMonth();
+// const yearMonth = getCurrentYearMonth();
+
+function formatDateToYearMonth(dateString) {
+  // Create a Date object from the string
+  const date = new Date(dateString);
+
+  // Extract the year and month
+  const year = date.getFullYear();
+  const month = date.toLocaleString("default", { month: "short" }); // Get the short month name
+
+  // Combine them into the desired format
+  return `${year}-${month}`;
+}
 
 const EditOrderForm = ({ order, products: initialProducts }) => {
   const [updateOrder, { isLoading, isSuccess, isError, error }] =
@@ -232,6 +245,8 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
       console.log("result:", result);
       console.log("newOrder:", updatedOrder);
 
+      const yearMonth = formatDateToYearMonth(order.createdAt);
+
       const newCommissionPayout = {
         salesPerson: order.salesPerson.user,
         yearMonth: yearMonth,
@@ -250,6 +265,27 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
 
   const onDeleteOrder = async () => {
     await deleteOrder({ id: order.id });
+
+    const cpYearMonth = formatDateToYearMonth(order.createdAt);
+
+    const deletedOrder = {
+      order: order.id,
+      action: "delete",
+    };
+
+    const deleteCommissionPayout = {
+      salesPerson: order.salesPerson.user,
+      yearMonth: cpYearMonth,
+      campaignId: order.salesPerson.campaign,
+      order: deletedOrder,
+    };
+
+    console.log("updateCommissionPayout:", deleteCommissionPayout);
+    const payoutResult = await updateCommissionPayout(deleteCommissionPayout); // Example payout
+    console.log("Commission payout created successfully:", payoutResult);
+    message.success(
+      "Campaign deleted and commission recalculated successfully"
+    );
   };
 
   const created = new Date(order.createdAt).toLocaleString("en-MY", {
@@ -620,6 +656,21 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
               disabled={isLoading}
             >
               Update Order
+            </Button>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Button
+              type="primary"
+              danger
+              title="Save"
+              icon={<DeleteOutlined />}
+              loading={isLoading}
+              disabled={isLoading}
+              onClick={onDeleteOrder}
+            >
+              Delete
             </Button>
           </Col>
         </Row>

@@ -105,8 +105,6 @@ const getAllCommissionPayoutsCampaigns = async (req, res) => {
       })
       .flat(); // Flattening the array if needed
 
-    console.log(campaignData);
-
     return res.status(200).json(campaignData);
   } catch (error) {
     console.error("Error fetching commission payouts:", error);
@@ -232,9 +230,26 @@ const updateCommissionPayout = async (req, res) => {
       .exec();
 
     if (!existingCommissionPayout) {
-      return res.status(404).json({
+      const campaigns = [
+        {
+          totalCommission: newOrder.commissionAmount,
+          campaign: campaignId,
+          orders: [newOrder],
+        },
+      ];
+
+      //Create and store new commissionPayout
+      const commissionPayout = await CommissionPayout.create({
+        salesPerson,
+        yearMonth,
+        campaigns,
+        totalPayout: newOrder.commissionAmount,
+      });
+
+      return res.status(201).json({
         message:
           "Commission payout not found for the given salesperson and month.",
+        campaigns: campaigns,
       });
     }
 
@@ -280,11 +295,17 @@ const updateCampaignOrders = async (campaign, order) => {
   );
 
   if (existingOrderIndex !== -1) {
-    // Update existing order
-    campaign.orders[existingOrderIndex] = {
-      ...campaign.orders[existingOrderIndex],
-      ...order,
-    };
+    // Check if the order is empty
+    if (order.action === "delete") {
+      // Delete the order if it's empty
+      campaign.orders.splice(existingOrderIndex, 1);
+    } else {
+      // Update existing order
+      campaign.orders[existingOrderIndex] = {
+        ...campaign.orders[existingOrderIndex],
+        ...order,
+      };
+    }
   } else {
     // Add new order
     campaign.orders.push(order);
@@ -296,10 +317,13 @@ const updateCampaignOrders = async (campaign, order) => {
 
 // Helper function to add a new campaign
 const addNewCampaign = async (campaigns, campaignId, order) => {
+  const orders = order && Object.keys(order).length > 0 ? [order] : []; // Check if order is empty
+  const totalCommission = orders.length > 0 ? order.commissionAmount || 0 : 0; // Get commissionAmount if available
+
   campaigns.push({
-    totalCommission: 0,
+    totalCommission,
     campaign: campaignId,
-    orders: [order],
+    orders,
   });
 };
 

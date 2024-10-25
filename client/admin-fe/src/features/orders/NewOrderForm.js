@@ -234,7 +234,10 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
         order: newOrder,
       };
 
-      console.log("newCommissionPayout:", newCommissionPayout);
+      console.log(
+        "updateCommissionPayout newCommissionPayout:",
+        newCommissionPayout
+      );
 
       const payoutResult = await updateCommissionPayout(newCommissionPayout); // Example payout
       console.log("Commission payout created successfully:", payoutResult);
