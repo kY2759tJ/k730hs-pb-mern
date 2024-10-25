@@ -322,12 +322,7 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
         <div className="form__title-row">
           <h2>New Order</h2>
         </div>
-        <Divider
-          orientation="left"
-          style={{ color: "#ffffff", borderColor: "#ffffff" }}
-        >
-          Order Information
-        </Divider>
+        <Divider orientation="left">Order Information</Divider>
         <Row>
           <Col span={12}>
             <Form.Item
@@ -345,12 +340,7 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
             </Form.Item>
           </Col>
         </Row>
-        <Divider
-          orientation="left"
-          style={{ color: "#ffffff", borderColor: "#ffffff" }}
-        >
-          Salesperson Information
-        </Divider>
+        <Divider orientation="left">Salesperson Information</Divider>
         <Row>
           <Col span={16}>
             <Form.Item
@@ -380,12 +370,7 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
             disabled
           />
         </Form.Item>
-        <Divider
-          orientation="left"
-          style={{ color: "#ffffff", borderColor: "#ffffff" }}
-        >
-          Customer Information
-        </Divider>
+        <Divider orientation="left">Customer Information</Divider>
 
         <Form.Item
           name="customerName"
@@ -440,12 +425,7 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
           <Input placeholder="Enter customer's profile URL" />
         </Form.Item>
 
-        <Divider
-          orientation="left"
-          style={{ color: "#ffffff", borderColor: "#ffffff" }}
-        >
-          Order Items
-        </Divider>
+        <Divider orientation="left">Order Items</Divider>
         <Row>
           <Col
             span={24}
@@ -536,12 +516,7 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
           )}
         </Modal>
 
-        <Divider
-          orientation="left"
-          style={{ color: "#ffffff", borderColor: "#ffffff" }}
-        >
-          Order Total
-        </Divider>
+        <Divider orientation="left">Order Total</Divider>
         <Row>
           <Col
             span={12}
@@ -570,10 +545,7 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
           </Col>
         </Row>
 
-        <Divider
-          orientation="left"
-          style={{ color: "#ffffff", borderColor: "#ffffff" }}
-        ></Divider>
+        <Divider orientation="left"></Divider>
         <Row>
           <Col span={12}>
             <Button

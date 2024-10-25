@@ -355,12 +355,7 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
         <div className="form__title-row">
           <h2>Edit Order #{order.orderId}</h2>
         </div>
-        <Divider
-          orientation="left"
-          style={{ color: "#ffffff", borderColor: "#ffffff" }}
-        >
-          Order Information
-        </Divider>
+        <Divider orientation="left">Order Information</Divider>
         <Row>
           <Col span={12}>
             <p className="form__created">
@@ -385,12 +380,7 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
             </Form.Item>
           </Col>
         </Row>
-        <Divider
-          orientation="left"
-          style={{ color: "#ffffff", borderColor: "#ffffff" }}
-        >
-          Salesperson Information
-        </Divider>
+        <Divider orientation="left">Salesperson Information</Divider>
         <Row>
           <Col span={6}>
             <p className="form__created">
@@ -427,12 +417,7 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
             disabled
           />
         </Form.Item>
-        <Divider
-          orientation="left"
-          style={{ color: "#ffffff", borderColor: "#ffffff" }}
-        >
-          Customer Information
-        </Divider>
+        <Divider orientation="left">Customer Information</Divider>
 
         <Form.Item
           name="customerName"
@@ -487,12 +472,7 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
           <Input placeholder="Enter customer's profile URL" />
         </Form.Item>
 
-        <Divider
-          orientation="left"
-          style={{ color: "#ffffff", borderColor: "#ffffff" }}
-        >
-          Order Items
-        </Divider>
+        <Divider orientation="left">Order Items</Divider>
         <Table
           dataSource={items}
           columns={columns}
@@ -591,12 +571,7 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
             </Row>
           </Card>
         )}
-        <Divider
-          orientation="left"
-          style={{ color: "#ffffff", borderColor: "#ffffff" }}
-        >
-          Order Total
-        </Divider>
+        <Divider orientation="left">Order Total</Divider>
         <Row>
           <Col
             span={12}
@@ -625,10 +600,7 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
           </Col>
         </Row>
 
-        <Divider
-          orientation="left"
-          style={{ color: "#ffffff", borderColor: "#ffffff" }}
-        ></Divider>
+        <Divider orientation="left"></Divider>
         <Row>
           <Col span={12}>
             <Col span={12}>
