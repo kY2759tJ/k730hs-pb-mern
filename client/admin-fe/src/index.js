@@ -11,6 +11,7 @@ import { store } from "./app/store";
 import { Provider } from "react-redux";
 
 import "./index.css";
+import "antd/dist/reset.css";
 import App from "./App";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

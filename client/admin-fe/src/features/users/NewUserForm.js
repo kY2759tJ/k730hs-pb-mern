@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAddNewUserMutation } from "./usersApiSlice";
 import { useNavigate } from "react-router-dom";
 import { ROLES } from "../../config/enums";
-import { Form, Input, Button, Select, InputNumber } from "antd";
+import { Form, Input, Button, Select, InputNumber, Divider } from "antd";
 
 const NAME_REGEX = /^[a-zA-Z]+([ '-][a-zA-Z]+)*$/;
 const USER_REGEX = /^[A-z]{3,20}$/;
@@ -57,8 +57,10 @@ const NewUserForm = () => {
         }}
       >
         <div className="form__title-row">
-          <h2>New User</h2>
+          <h2>Add User</h2>
         </div>
+
+        <Divider />
 
         <Form.Item
           name="fullname"

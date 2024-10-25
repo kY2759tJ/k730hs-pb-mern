@@ -12,6 +12,7 @@ import {
   Button,
   Tooltip,
   InputNumber,
+  Divider,
 } from "antd";
 
 const NAME_REGEX = /^[a-zA-Z]+([ '-][a-zA-Z]+)*$/;
@@ -62,15 +63,13 @@ const EditUserForm = ({ user }) => {
     value: role,
   }));
 
-  const errorMessage = error?.data?.message || delError?.data?.message || "";
-  const showMessage = (isError || isDelError) && errorMessage;
+  const errContent = error?.data?.message ?? "";
+  const errClass = isError ? "errmsg" : "offscreen";
 
   const content = (
     <>
-      {showMessage && <p className="errmsg">{errorMessage}</p>}
-      <div className="form__title-row">
-        <h2>Edit User</h2>
-      </div>
+      <p className={errClass}>{errContent}</p>
+
       <Form
         form={form}
         layout="vertical"
@@ -84,6 +83,11 @@ const EditUserForm = ({ user }) => {
         }}
         style={{ maxWidth: 600 }}
       >
+        <div className="form__title-row">
+          <h2>Edit User</h2>
+        </div>
+
+        <Divider />
         <Form.Item
           name="active"
           valuePropName="checked"
