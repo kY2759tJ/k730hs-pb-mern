@@ -19,7 +19,7 @@ import {
   Space,
 } from "antd";
 import { CustomerPlatforms, OrderStatuses } from "../../config/enums";
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { addProductToList, onEditProduct } from "../../utils/productUtils";
 
 const getCurrentYearMonth = () => {
@@ -119,8 +119,12 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
     setItems(items);
   }, [items, form, commissionRate]);
 
+  const handleDeleteItem = (productId) => {
+    const updatedItems = items.filter((item) => item.product !== productId);
+    setItems(updatedItems);
+  };
+
   const handleNewProduct = (product) => {
-    console.log("handleNewProduct ", product);
     addProductToList(product, setProducts, setItems);
     setIsProductModalOpen(false); // Close the modal
   };
@@ -193,6 +197,15 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
   };
 
   const onFinish = async (values) => {
+    // If items are empty after deletion, trigger order deletion
+    if (items.length === 0) {
+      return Modal.warning({
+        title: "No items in the order",
+        content:
+          "Please add at least one item to proceed with adding new order.",
+      });
+    }
+
     const payload = {
       salesPerson: {
         user: user.id, // Assuming this remains unchanged
@@ -269,6 +282,13 @@ const NewOrderForm = ({ user, campaigns, products: initialProducts }) => {
                 basePrice: record.basePrice,
               })
             }
+          />
+          <Button
+            type="primary"
+            shape="circle"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDeleteItem(record.product)}
           />
         </Space>
       ),
