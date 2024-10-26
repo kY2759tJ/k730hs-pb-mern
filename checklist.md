@@ -12,32 +12,34 @@
    3. [x] View campaigns list - salesperson view only selft created campaigns
    4. [x] Add new campaign
    5. [x] Edit campaign
-   6. [ ] Delete campaign
+   6. [x] Delete campaign - delete from commission payouts, delete orders associated with commission payouts,
 4. [ ] Products
    1. [x] View products list
    2. [x] Add new products
    3. [x] Edit products
    4. [ ] Delete products
 5. [ ] Orders
-
    1. [x] View orders list
    2. [x] Add new orders
-   3. [x] Add new orders form - Add new product from new order form
-   4. [x] Add new orders form - Automatically add new product to order with name, quantity, baseprice
-   5. [x] Add new orders form - Select product to add to order
-   6. [x] Add new orders form - Change product name and base price
-   7. [x] Add new orders form - Change product quantity
-   8. [ ] Add new orders form - Delete product
-   9. [ ] Add new orders form - commissionAmount save to salesperson
-   10. [x] Edit orders
-   11. [x] Edit orders form - Change customer information
-   12. [x] Edit orders form Change product quantity, totalAmmount and commissionAmount calculated accordingly
-   13. [x] Edit orders form - Add new item, totalAmount and commissionAmount calculated accordingly
-   14. [x] Edit orders form - If product exist, add to quantity; else, add new product
-   15. [x] Edit orders form - products can change name and base price
-   16. [ ] Edit orders form - Delete product, totalAmount and commissionAmount calculated accordingly
-   17. [ ] Edit new orders form - commissionAmount save to salesperson
-   18. [ ] Delete orders
-   19. [ ] Delete orders, deduct commission from salesperson
-
+   3. [x] Add new order form - Add new product from new order form
+   4. [x] Add new order form - Automatically add new product to order with name, quantity, baseprice
+   5. [ ] Add new order form - list of campaigns list only by salesperson
+   6. [x] Add new orders form - Select product to add to order
+   7. [x] Add new orders form - Change product name and base price
+   8. [x] Add new orders form - Change product quantity
+   9. [ ] Add new orders form - Delete product
+   10. [x] Add new orders form - comm issionAmount save to salesperson
+   11. [x] Edit orders
+   12. [x] Edit orders form - Change customer information
+   13. [x] Edit orders form Change product quantity, totalAmmount and commissionAmount calculated accordingly
+   14. [x] Edit orders form - Add new item, totalAmount and commissionAmount calculated accordingly
+   15. [x] Edit orders form - If product exist, add to quantity; else, add new product
+   16. [x] Edit orders form - products can change name and base price
+   17. [x] Edit orders form - Delete product, totalAmount and commissionAmount calculated accordingly
+   18. [x] Edit new orders form - commissionAmount save to salesperson
+   19. [x] Delete orders - delete from commissionPayout, recalcualte totalCommisison and totalPayout
+   20. [x] Delete orders, deduct commission from salesperson
 6. [ ] Commission Payout
+   1. [x] View list of commission payout by year-month
+   2. [x] Click on year month, view list of commission
+   3. [x] salesperson view own list of commission payout
