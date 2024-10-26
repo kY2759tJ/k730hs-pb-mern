@@ -11,6 +11,7 @@ import {
   UserOutlined,
   LogoutOutlined,
   AccountBookOutlined,
+  BorderOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 
@@ -42,16 +43,16 @@ const DashLayout = () => {
     ...(isAdmin
       ? [
           {
-            key: "1",
+            key: "Users",
             icon: <UserOutlined />,
             label: <Link to="/dash/users">Users</Link>,
             children: [
               {
-                key: "1-1",
+                key: "Users-1",
                 label: <Link to="/dash/users">View User Settings</Link>,
               },
               {
-                key: "1-2",
+                key: "Users-2",
                 label: <Link to="/dash/users/new">Add New User</Link>,
               },
             ],
@@ -59,39 +60,60 @@ const DashLayout = () => {
         ]
       : []), // If not admin, add no items
     {
-      key: "2",
+      key: "Campaigns",
       icon: <NotificationOutlined />,
       label: <Link to="/dash/campaigns">Campaigns</Link>,
       children: [
-        { key: "2-1", label: <Link to="/dash/campaigns">View Campaigns</Link> },
         {
-          key: "2-2",
+          key: "Campaigns-1",
+          label: <Link to="/dash/campaigns">View Campaigns</Link>,
+        },
+        {
+          key: "Campaigns-2",
           label: <Link to="/dash/campaigns/new">Add New Campaign</Link>,
         },
       ],
     },
     {
-      key: "3",
+      key: "Orders",
       icon: <AppstoreAddOutlined />,
       label: <Link to="/dash/orders">Orders</Link>,
       children: [
-        { key: "3-1", label: <Link to="/dash/orders">View Orders</Link> },
-        { key: "3-2", label: <Link to="/dash/orders/new">Add New Order</Link> },
+        { key: "Orders-1", label: <Link to="/dash/orders">View Orders</Link> },
+        {
+          key: "Orders-2",
+          label: <Link to="/dash/orders/new">Add New Order</Link>,
+        },
       ],
     },
     {
-      key: "4",
-      icon: <AccountBookOutlined />,
-      label: <Link to="/dash/commissionPayouts">Commissions</Link>,
+      key: "Products",
+      icon: <BorderOutlined />,
+      label: <Link to="/dash/products">Products</Link>,
       children: [
         {
-          key: "4-1",
-          label: <Link to="/dash/commissionPayouts">View Commissions</Link>,
+          key: "Products-1",
+          label: <Link to="/dash/products">View Products</Link>,
+        },
+        {
+          key: "Products-2",
+          label: <Link to="/dash/products/new">Add New Product</Link>,
         },
       ],
     },
     {
       key: "5",
+      icon: <AccountBookOutlined />,
+      label: <Link to="/dash/commissionPayouts">Commissions</Link>,
+      children: [
+        {
+          key: "5-1",
+          label: <Link to="/dash/commissionPayouts">View Commissions</Link>,
+        },
+      ],
+    },
+    {
+      key: "6",
       icon: <LogoutOutlined />,
       label: "Logout",
       onClick: handleLogout, // Add the onClick handler here
