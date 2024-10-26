@@ -32,18 +32,19 @@ function App() {
         path="/"
         element={<Layout />}
       >
-        {/* Public routes*/}
-        <Route
-          index
-          element={<Public />}
-        />
-        <Route
-          path="login"
-          element={<Login />}
-        />
-
         {/* Proctected routes */}
         <Route element={<PersistLogin />}>
+          {/* Public routes*/}
+          <Route
+            index
+            element={<Login />}
+          />
+
+          <Route
+            path="login"
+            element={<Login />}
+          />
+
           <Route
             element={<RequireAuth allowedRoles={[...Object.values(ROLES)]} />}
           >

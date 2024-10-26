@@ -6,9 +6,13 @@ import { setCredentials } from "./authSlice";
 import { useLoginMutation } from "./authApiSlice";
 import usePersist from "../../hooks/usePersist";
 import PulseLoader from "react-spinners/PulseLoader";
+import useAuth from "../../hooks/useAuth";
 
 const Login = () => {
   const userRef = useRef();
+  const { userId } = useAuth();
+  console.log(useAuth());
+
   const [errMsg, setErrMsg] = useState("");
   const [persist, setPersist] = usePersist();
 
@@ -26,7 +30,8 @@ const Login = () => {
     try {
       const { accessToken } = await login({ username, password }).unwrap();
       dispatch(setCredentials({ accessToken }));
-      navigate("/dash");
+      localStorage.setItem("accessToken", accessToken);
+      navigate("/dash", { replace: true });
     } catch (err) {
       if (!err.status) {
         setErrMsg("No Server Response");
@@ -40,6 +45,12 @@ const Login = () => {
       message.error(errMsg); // Display error using Ant Design message
     }
   };
+
+  useEffect(() => {
+    if (userId) {
+      navigate("/dash", { replace: true });
+    }
+  }, [userId, navigate]);
 
   const onPersistChange = (e) => setPersist(e.target.checked);
 

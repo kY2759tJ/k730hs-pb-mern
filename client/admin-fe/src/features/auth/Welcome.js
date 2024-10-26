@@ -4,6 +4,7 @@ import { Layout } from "antd";
 
 const Welcome = () => {
   const { username, isAdmin } = useAuth();
+  console.log(useAuth());
 
   const date = new Date();
   const today = new Intl.DateTimeFormat("en-MY", {
