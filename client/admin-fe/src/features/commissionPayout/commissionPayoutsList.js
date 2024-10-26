@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useGetCommissionPayoutsQuery } from "./commissionPayoutsApiSlice";
 import { Space, Table, Tag, Button } from "antd";
-import { EditOutlined, EyeOutlined } from "@ant-design/icons";
+import { EyeOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import PulseLoader from "react-spinners/PulseLoader";

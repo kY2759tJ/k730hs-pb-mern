@@ -1,8 +1,6 @@
 import React, { useMemo } from "react";
 import { useGetCommissionPayoutsCampaignsQuery } from "./commissionPayoutsApiSlice";
-import { Space, Table, Tag, Button } from "antd";
-import { EditOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { Table } from "antd";
 import useAuth from "../../hooks/useAuth";
 import PulseLoader from "react-spinners/PulseLoader";
 import { useLocation } from "react-router-dom";
@@ -31,8 +29,6 @@ const CommissionPayoutsCampaignsList = React.memo(() => {
       refetchOnMountOrArgChange: true,
     }
   );
-
-  const navigate = useNavigate();
 
   const columns = useMemo(
     () => [
