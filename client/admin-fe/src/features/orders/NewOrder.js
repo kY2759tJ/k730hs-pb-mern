@@ -19,9 +19,18 @@ const NewOrder = () => {
 
   const { campaigns } = useGetCampaignsQuery("campaignsList", {
     selectFromResult: ({ data }) => ({
-      campaigns: data?.ids.map((id) => data?.entities[id]),
+      campaigns: data
+        ? data.ids
+            .map((id) => data.entities[id])
+            .filter(
+              (campaign) =>
+                campaign.user === user?.id && campaign.status === "Active"
+            )
+        : [],
     }),
   });
+
+  console.log(campaigns);
 
   const { products } = useGetProductsQuery("productsList", {
     selectFromResult: ({ data }) => ({
