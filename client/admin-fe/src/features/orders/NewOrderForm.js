@@ -15,19 +15,12 @@ import {
   Table,
   InputNumber,
   Card,
-  message,
   Modal,
   Space,
 } from "antd";
 import { CustomerPlatforms, OrderStatuses } from "../../config/enums";
 import { EditOutlined } from "@ant-design/icons";
 import { addProductToList, onEditProduct } from "../../utils/productUtils";
-
-// URL validation rule
-const urlValidationRule = {
-  type: "url",
-  message: "Please enter a valid URL!",
-};
 
 const getCurrentYearMonth = () => {
   const date = new Date();

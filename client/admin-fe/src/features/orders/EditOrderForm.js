@@ -26,23 +26,6 @@ import { addProductToList, onEditProduct } from "../../utils/productUtils";
 import NewProductForm from "../products/NewProductForm";
 import EditProductForm from "../products/EditProductForm";
 
-// URL validation rule
-const urlValidationRule = {
-  type: "url",
-  message: "Please enter a valid URL!",
-};
-
-// const getCurrentYearMonth = () => {
-//   const date = new Date();
-//   const year = date.getFullYear();
-//   const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(
-//     date
-//   );
-//   return `${year}-${month}`;
-// };
-
-// const yearMonth = getCurrentYearMonth();
-
 function formatDateToYearMonth(dateString) {
   // Create a Date object from the string
   const date = new Date(dateString);
