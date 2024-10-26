@@ -109,6 +109,19 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
     setItems(items);
   }, [items, form, commissionRate]);
 
+  const handleDeleteItem = (productId) => {
+    if (items.length === 1) {
+      return Modal.warning({
+        title: "Cannot delete the last item",
+        content:
+          "An order must have at least one item. Add another item before deleting.",
+      });
+    }
+
+    const updatedItems = items.filter((item) => item.product !== productId);
+    setItems(updatedItems);
+  };
+
   // Handle add new product
   const handleNewProduct = (product) => {
     addProductToList(product, setProducts, setItems);
@@ -188,6 +201,15 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
   };
 
   const onFinish = async (values) => {
+    // If items are empty after deletion, trigger order deletion
+    if (items.length === 0) {
+      return Modal.warning({
+        title: "No items in the order",
+        content:
+          "Please add at least one item to proceed with the order update.",
+      });
+    }
+
     const payload = {
       id: order.id,
       salesPerson: {
@@ -225,9 +247,6 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
         commissionAmount: values.commissionAmount,
       };
 
-      console.log("result:", result);
-      console.log("newOrder:", updatedOrder);
-
       const yearMonth = formatDateToYearMonth(order.createdAt);
 
       const newCommissionPayout = {
@@ -247,28 +266,35 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
   };
 
   const onDeleteOrder = async () => {
-    await deleteOrder({ id: order.id });
+    Modal.confirm({
+      title: "Are you sure you want to delete this order?",
+      content: "This action cannot be undone.",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk: async () => {
+        await deleteOrder({ id: order.id });
 
-    const cpYearMonth = formatDateToYearMonth(order.createdAt);
+        const cpYearMonth = formatDateToYearMonth(order.createdAt);
 
-    const deletedOrder = {
-      order: order.id,
-      action: "delete",
-    };
+        const deletedOrder = {
+          order: order.id,
+          action: "delete",
+        };
 
-    const deleteCommissionPayout = {
-      salesPerson: order.salesPerson.user,
-      yearMonth: cpYearMonth,
-      campaignId: order.salesPerson.campaign,
-      order: deletedOrder,
-    };
+        const deleteCommissionPayout = {
+          salesPerson: order.salesPerson.user,
+          yearMonth: cpYearMonth,
+          campaignId: order.salesPerson.campaign,
+          order: deletedOrder,
+        };
 
-    console.log("updateCommissionPayout:", deleteCommissionPayout);
-    const payoutResult = await updateCommissionPayout(deleteCommissionPayout); // Example payout
-    console.log("Commission payout created successfully:", payoutResult);
-    message.success(
-      "Campaign deleted and commission recalculated successfully"
-    );
+        await updateCommissionPayout(deleteCommissionPayout); // Example payout
+        message.success(
+          "Campaign deleted and commission recalculated successfully"
+        );
+      },
+    });
   };
 
   const created = new Date(order.createdAt).toLocaleString("en-MY", {
@@ -307,6 +333,13 @@ const EditOrderForm = ({ order, products: initialProducts }) => {
                 basePrice: record.basePrice,
               })
             }
+          />
+          <Button
+            type="primary"
+            shape="circle"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDeleteItem(record.product)}
           />
         </Space>
       ),
