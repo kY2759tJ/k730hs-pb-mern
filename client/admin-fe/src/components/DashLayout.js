@@ -1,10 +1,8 @@
 import { Outlet } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useSendLogoutMutation } from "../features/auth/authApiSlice";
 
-//import DashHeader from "./DashHeader";
-//import DashFooter from "./DashFooter";
 import {
   AppstoreAddOutlined,
   NotificationOutlined,
@@ -17,15 +15,10 @@ import { Layout, Menu } from "antd";
 
 const { Header, Sider } = Layout;
 
-const DASH_REGEX = /^\/dash(\/)?$/;
-const NOTES_REGEX = /^\/dash\/campaigns(\/)?$/;
-const USERS_REGEX = /^\/dash\/users(\/)?$/;
-
 const DashLayout = () => {
   const { isAdmin } = useAuth();
 
   const navigate = useNavigate();
-  const { pathname } = useLocation();
 
   const [sendLogout, { isLoading, isSuccess, isError, error }] =
     useSendLogoutMutation();

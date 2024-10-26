@@ -1,9 +1,8 @@
-import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { Layout } from "antd";
 
 const Welcome = () => {
-  const { username, isAdmin } = useAuth();
+  const { username } = useAuth();
   console.log(useAuth());
 
   const date = new Date();
@@ -19,6 +18,7 @@ const Welcome = () => {
         style={{ marginTop: "20px" }}
       >
         <h1>Welcome {username} !</h1>
+        <p>{today}</p>
       </section>
     </Layout>
   );
