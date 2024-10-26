@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAddNewProductMutation } from "./productsApiSlice";
 import { Form, Input, Button, Divider, message, InputNumber } from "antd";
@@ -17,7 +17,7 @@ const NewProductForm = ({ isInModal, onAddProduct }) => {
         navigate("/dash/products"); // Only navigate if not in modal
       }
     }
-  }, [isSuccess, navigate, form]);
+  }, [isSuccess, isInModal, navigate, form]);
 
   const onFinish = async (values) => {
     const { productName, basePrice } = values;

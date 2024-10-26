@@ -4,7 +4,7 @@ import {
   useDeleteProductMutation,
 } from "./productsApiSlice";
 import { useNavigate } from "react-router-dom";
-import { Row, Col, Divider, Form, Input, Button, Select } from "antd";
+import { Row, Col, Divider, Form, Input, Button } from "antd";
 
 const EditProductForm = ({ isInModal, product, onEditProduct }) => {
   const [updateProduct, { isLoading, isSuccess, isError, error }] =
@@ -25,7 +25,7 @@ const EditProductForm = ({ isInModal, product, onEditProduct }) => {
       }
       form.resetFields();
     }
-  }, [isSuccess, isDelSuccess, navigate, form]);
+  }, [isSuccess, isDelSuccess, isInModal, navigate, form]);
 
   useEffect(() => {
     if (product) {
@@ -37,11 +37,6 @@ const EditProductForm = ({ isInModal, product, onEditProduct }) => {
 
   const onFinish = async (values) => {
     const { productName, basePrice } = values;
-    // console.log("Payload to send:", {
-    //   id: product.id,
-    //   productName,
-    //   basePrice,
-    // }); // Add this line for debugging
 
     try {
       const editedProduct = await updateProduct({
@@ -64,23 +59,6 @@ const EditProductForm = ({ isInModal, product, onEditProduct }) => {
   const onDeleteProduct = async () => {
     await deleteProduct({ id: product.id });
   };
-
-  const created = new Date(product.createdAt).toLocaleString("en-MY", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-  });
-  const updated = new Date(product.updatedAt).toLocaleString("en-MY", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-  });
 
   const errClass = isError ? "errmsg" : "offscreen";
   const errContent = error?.data?.message ?? "";
@@ -125,13 +103,6 @@ const EditProductForm = ({ isInModal, product, onEditProduct }) => {
         </Form.Item>
         <div className="form__divider"></div>
         <Row>
-          <Col span={12}>
-            <p className="form__updated">
-              Date Updated:
-              <br />
-              {updated}
-            </p>
-          </Col>
           <Col span={12}>
             <Button
               type="primary"

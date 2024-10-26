@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import EditProductForm from "./EditProductForm";
 import { useGetProductsQuery } from "./productsApiSlice";
-import { useGetUsersQuery } from "../users/usersApiSlice";
 import useAuth from "../../hooks/useAuth";
 import PulseLoader from "react-spinners/PulseLoader";
 import useTitle from "../../hooks/useTitle";

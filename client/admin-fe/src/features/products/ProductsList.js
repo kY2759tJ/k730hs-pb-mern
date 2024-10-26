@@ -1,14 +1,11 @@
 import React, { useMemo } from "react";
 import { useGetProductsQuery } from "./productsApiSlice";
-import { Space, Table, Tag, Button } from "antd";
+import { Space, Table, Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
 import PulseLoader from "react-spinners/PulseLoader";
 
 const ProductsList = React.memo(() => {
-  const { username, isAdmin } = useAuth();
-
   const {
     data: products,
     isLoading,
